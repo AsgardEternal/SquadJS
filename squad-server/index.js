@@ -214,9 +214,6 @@ export default class SquadServer extends EventEmitter {
       console.log('logging player connected');
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (data.player) data.player.suffix = data.playerSuffix;
-      else {
-        console.log(data);
-      }
 
       delete data.steamID;
       delete data.playerSuffix;
@@ -226,8 +223,6 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
-      
-      if (!data.player) console.log(data);
 
       delete data.steamID;
 
@@ -368,6 +363,12 @@ export default class SquadServer extends EventEmitter {
 
       for (const player of this.players) {
         if (typeof oldPlayerInfo[player.steamID] === 'undefined') continue;
+        if (player.name !== oldPlayerInfo[player.steamID].name)
+          this.emit('PLAYER_NAME_CHANGE', {
+            player: player,
+            oldName: oldPlayerInfo[player.steamID].name,
+            newName: player.name
+          });
         if (player.teamID !== oldPlayerInfo[player.steamID].teamID)
           this.emit('PLAYER_TEAM_CHANGE', {
             player: player,
