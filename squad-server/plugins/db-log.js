@@ -428,7 +428,7 @@ export default class DBLog extends BasePlugin {
     this.server.on('TICK_RATE', this.onTickRate);
     this.server.on('UPDATED_A2S_INFORMATION', this.onUpdatedA2SInformation);
     this.server.on('NEW_GAME', this.onNewGame);
-    this.server.on('PLAYER_NAME_CHANGED', this.onPlayerNameChange);
+    this.server.on('PLAYER_NAME_CHANGE', this.onPlayerNameChange);
     this.server.on('PLAYER_WOUNDED', this.onPlayerWounded);
     this.server.on('PLAYER_DIED', this.onPlayerDied);
     this.server.on('PLAYER_REVIVED', this.onPlayerRevived);
@@ -438,7 +438,7 @@ export default class DBLog extends BasePlugin {
     this.server.removeEventListener('TICK_RATE', this.onTickRate);
     this.server.removeEventListener('UPDATED_A2S_INFORMATION', this.onTickRate);
     this.server.removeEventListener('NEW_GAME', this.onNewGame);
-    this.server.removeEventListener('PLAYER_NAME_CHANGED', this.onPlayerNameChange);
+    this.server.removeEventListener('PLAYER_NAME_CHANGE', this.onPlayerNameChange);
     this.server.removeEventListener('PLAYER_WOUNDED', this.onPlayerWounded);
     this.server.removeEventListener('PLAYER_DIED', this.onPlayerDied);
     this.server.removeEventListener('PLAYER_REVIVED', this.onPlayerRevived);
