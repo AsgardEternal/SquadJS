@@ -146,7 +146,6 @@ export default class SquadServer extends EventEmitter {
       data.player = await this.getPlayerBySteamID(data.steamID);
 
       this.emit('PLAYER_KICKED', data);
-      this.emit('PLAYER_DISCONNECTED', data);
     });
 
     this.rcon.on('PLAYER_BANNED', async (data) => {
@@ -154,7 +153,6 @@ export default class SquadServer extends EventEmitter {
       data.player = await this.getPlayerBySteamID(data.steamID);
 
       this.emit('PLAYER_BANNED', data);
-      this.emit('PLAYER_DISCONNECTED', data);
     });
 
     this.rcon.on('SQUAD_CREATED', async (data) => {
