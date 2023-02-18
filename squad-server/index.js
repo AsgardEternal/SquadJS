@@ -214,9 +214,6 @@ export default class SquadServer extends EventEmitter {
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (data.player) data.player.suffix = data.playerSuffix;
 
-      delete data.steamID;
-      delete data.playerSuffix;
-
       this.emit('PLAYER_CONNECTED', data);
     });
 
@@ -224,8 +221,6 @@ export default class SquadServer extends EventEmitter {
       console.log('player disconnected');
       console.log(data);
       data.player = await this.getPlayerBySteamID(data.steamID);
-
-      delete data.steamID;
 
       this.emit('PLAYER_DISCONNECTED', data);
     });
