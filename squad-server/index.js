@@ -215,7 +215,8 @@ export default class SquadServer extends EventEmitter {
       if (data.player) data.player.suffix = data.playerSuffix;
       else{
         data.player = {
-          steamID: data.steamID
+          steamID: data.steamID,
+          name: data.playerSuffix
         }
       }
 
