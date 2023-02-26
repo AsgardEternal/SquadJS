@@ -26,7 +26,7 @@ export default {
         time: data.time,
         chainID: data.chainID,
         winner: data.subfaction,
-        layer: data.layer
+        layer: data.level
       };
     } else {
       logParser.eventStore.ROUND_LOSER = data;
