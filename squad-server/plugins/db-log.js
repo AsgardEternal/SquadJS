@@ -420,10 +420,8 @@ export default class DBLog extends BasePlugin {
       id: this.options.overrideServerID || this.server.id,
       name: this.server.serverName
     });
-
-    this.match = await this.models.Match.findOne({
-      where: { server: this.options.overrideServerID || this.server.id, endTime: null }
-    });
+    
+    this.repairDB();
 
     this.server.on('TICK_RATE', this.onTickRate);
     this.server.on('UPDATED_A2S_INFORMATION', this.onUpdatedA2SInformation);
@@ -432,6 +430,12 @@ export default class DBLog extends BasePlugin {
     this.server.on('PLAYER_WOUNDED', this.onPlayerWounded);
     this.server.on('PLAYER_DIED', this.onPlayerDied);
     this.server.on('PLAYER_REVIVED', this.onPlayerRevived);
+  }
+  
+  async repairDB() {
+    this.match = await this.models.Match.findOne({
+      where: { server: this.options.overrideServerID || this.server.id, endTime: null }
+    });
   }
 
   async unmount() {
