@@ -421,7 +421,7 @@ export default class DBLog extends BasePlugin {
       name: this.server.serverName
     });
     
-    this.repairDB();
+    await this.repairDB();
 
     this.server.on('TICK_RATE', this.onTickRate);
     this.server.on('UPDATED_A2S_INFORMATION', this.onUpdatedA2SInformation);
