@@ -425,8 +425,10 @@ export default class SquadServer extends EventEmitter {
       const currentMap = await this.rcon.getCurrentMap();
       const nextMap = await this.rcon.getNextMap();
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
+      console.log(currentMap);
 
       const currentLayer = await Layers.getLayerByName(currentMap.layer);
+      console.log(currentLayer);
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
 
       if (this.layerHistory.length === 0) {
