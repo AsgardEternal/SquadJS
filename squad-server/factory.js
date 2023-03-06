@@ -112,6 +112,7 @@ export default class SquadServerFactory {
     }
 
     if (type === 'sequelize') {
+      Logger.verbose('SquadServerFactory', 2, `Connector is SQL Type`);
       let connector;
 
       if (typeof connectorConfig === 'string') {
@@ -130,8 +131,10 @@ export default class SquadServerFactory {
       } else {
         throw new Error('Unknown sequelize connector config type.');
       }
+      Logger.verbose('SquadServerFactory', 2, `Connector created SQL client`);
 
       await connector.authenticate();
+      Logger.verbose('SquadServerFactory', 2, `Connector Logged into SQL`);
       return connector;
     }
 
