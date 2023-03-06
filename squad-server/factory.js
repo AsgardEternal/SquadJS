@@ -103,16 +103,16 @@ export default class SquadServerFactory {
     Logger.verbose('SquadServerFactory', 1, `Starting ${type} connector ${connectorName}...`);
 
     if (type === 'discord') {
-      Logger.verbose('SquadServerFactory', 2, `Connector is Discord Type`);
+      Logger.verbose('SquadServerFactory', 1, `Connector is Discord Type`);
       const connector = new Discord.Client();
-      Logger.verbose('SquadServerFactory', 2, `Connector created Discord client`);
+      Logger.verbose('SquadServerFactory', 1, `Connector created Discord client`);
       await connector.login(connectorConfig);
-      Logger.verbose('SquadServerFactory', 2, `Connector Logged into Discord`);
+      Logger.verbose('SquadServerFactory', 1, `Connector Logged into Discord`);
       return connector;
     }
 
     if (type === 'sequelize') {
-      Logger.verbose('SquadServerFactory', 2, `Connector is SQL Type`);
+      Logger.verbose('SquadServerFactory', 1, `Connector is SQL Type`);
       let connector;
 
       if (typeof connectorConfig === 'string') {
@@ -131,10 +131,10 @@ export default class SquadServerFactory {
       } else {
         throw new Error('Unknown sequelize connector config type.');
       }
-      Logger.verbose('SquadServerFactory', 2, `Connector created SQL client`);
+      Logger.verbose('SquadServerFactory', 1, `Connector created SQL client`);
 
       await connector.authenticate();
-      Logger.verbose('SquadServerFactory', 2, `Connector Logged into SQL`);
+      Logger.verbose('SquadServerFactory', 1, `Connector Logged into SQL`);
       return connector;
     }
 
