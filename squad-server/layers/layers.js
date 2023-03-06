@@ -40,7 +40,7 @@ class Layers {
     await this.pull();
 
     const matches = this.layers.filter(condition);
-    if (matches.length === 1) return matches[0];
+    if (matches.length >= 1) return matches[0];
 
     return null;
   }
