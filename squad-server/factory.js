@@ -103,8 +103,11 @@ export default class SquadServerFactory {
     Logger.verbose('SquadServerFactory', 1, `Starting ${type} connector ${connectorName}...`);
 
     if (type === 'discord') {
+      Logger.verbose('SquadServerFactory', 2, `Connector is Discord Type`);
       const connector = new Discord.Client();
+      Logger.verbose('SquadServerFactory', 2, `Connector created Discord client`);
       await connector.login(connectorConfig);
+      Logger.verbose('SquadServerFactory', 2, `Connector Logged into Discord`);
       return connector;
     }
 
