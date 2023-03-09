@@ -27,6 +27,7 @@ class Layers {
 
     for (const layer of response.data.Maps) {
       this.layers.push(new Layer(layer));
+      console.log(layer);
     }
 
     Logger.verbose('Layers', 1, `Pulled ${this.layers.length} layers.`);
