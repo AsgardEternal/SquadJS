@@ -434,6 +434,10 @@ export default class SquadServer extends EventEmitter {
       console.log(currentLayer);
       if(!currentLayer) currentLayer = await Layers.getLayerByClassname(currentMap.layer);
       console.log(currentLayer);
+      if(!currentLayer){
+        if(currentMap.level === "Jensens") currentLayer = await Layers.getLayerByName("Jensen's Training Range");
+      }
+      console.log(currentLayer);
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
 
       if (this.layerHistory.length === 0) {
