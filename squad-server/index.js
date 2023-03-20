@@ -445,6 +445,7 @@ export default class SquadServer extends EventEmitter {
         this.layerHistory = this.layerHistory.slice(0, this.layerHistoryMaxLength);
       }
 
+      this.currentLayerRcon = currentMap;
       this.currentLayer = currentLayer;
       this.nextLayer = nextLayer;
       this.nextLayerToBeVoted = nextMapToBeVoted;
