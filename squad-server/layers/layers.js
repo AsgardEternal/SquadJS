@@ -24,6 +24,10 @@ class Layers {
     const response = await axios.post( // Change get to post for mod support
       'http://hub.afocommunity.com/api/layers.json', [0, 1959152751]
     );
+    
+//     const response = await axios.get(
+//       'https://raw.githubusercontent.com/Squad-Wiki/squad-wiki-pipeline-map-data/master/completed_output/_Current%20Version/finished.json'
+//     );
 
     for (const layer of response.data.Maps) {
       this.layers.push(new Layer(layer));
