@@ -63,9 +63,9 @@ export default class SquadServer extends EventEmitter {
 
   async watch() {
     Logger.verbose(
-      'SquadServer',
-      1,
-      `Beginning to watch ${this.options.host}:${this.options.queryPort}...`
+        'SquadServer',
+        1,
+        `Beginning to watch ${this.options.host}:${this.options.queryPort}...`
     );
 
     await Layers.pull();
@@ -142,14 +142,12 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.rcon.on('PLAYER_KICKED', async (data) => {
-      console.log('player kicked');
       data.player = await this.getPlayerBySteamID(data.steamID);
 
       this.emit('PLAYER_KICKED', data);
     });
 
     this.rcon.on('PLAYER_BANNED', async (data) => {
-      console.log('player banned');
       data.player = await this.getPlayerBySteamID(data.steamID);
 
       this.emit('PLAYER_BANNED', data);
@@ -178,11 +176,11 @@ export default class SquadServer extends EventEmitter {
 
   setupLogParser() {
     this.logParser = new LogParser(
-      Object.assign(this.options.ftp, {
-        mode: this.options.logReaderMode,
-        logDir: this.options.logDir,
-        host: this.options.ftp.host || this.options.host
-      })
+        Object.assign(this.options.ftp, {
+          mode: this.options.logReaderMode,
+          logDir: this.options.logDir,
+          host: this.options.ftp.host || this.options.host
+        })
     );
 
     this.logParser.on('ADMIN_BROADCAST', (data) => {
@@ -209,8 +207,6 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.logParser.on('PLAYER_CONNECTED', async (data) => {
-      console.log('player connected');
-      console.log(data);
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (data.player) data.player.suffix = data.playerSuffix;
       else{
@@ -224,8 +220,6 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
-      console.log('player disconnected');
-      console.log(data);
       data.player = await this.getPlayerBySteamID(data.steamID);
       if(!data.player){
         data.player = {
@@ -242,8 +236,8 @@ export default class SquadServer extends EventEmitter {
 
       if (data.victim && data.attacker)
         data.teamkill =
-          data.victim.teamID === data.attacker.teamID &&
-          data.victim.steamID !== data.attacker.steamID;
+            data.victim.teamID === data.attacker.teamID &&
+            data.victim.steamID !== data.attacker.steamID;
 
       delete data.victimName;
       delete data.attackerName;
@@ -257,8 +251,8 @@ export default class SquadServer extends EventEmitter {
 
       if (data.victim && data.attacker)
         data.teamkill =
-          data.victim.teamID === data.attacker.teamID &&
-          data.victim.steamID !== data.attacker.steamID;
+            data.victim.teamID === data.attacker.teamID &&
+            data.victim.steamID !== data.attacker.steamID;
 
       delete data.victimName;
       delete data.attackerName;
@@ -273,14 +267,14 @@ export default class SquadServer extends EventEmitter {
 
       if (data.victim && data.attacker)
         data.teamkill =
-          data.victim.teamID === data.attacker.teamID &&
-          data.victim.steamID !== data.attacker.steamID;
+            data.victim.teamID === data.attacker.teamID &&
+            data.victim.steamID !== data.attacker.steamID;
 
       delete data.victimName;
       delete data.attackerName;
-      
+
       console.log(data);
-      
+
       this.emit('PLAYER_DIED', data);
     });
 
@@ -454,8 +448,8 @@ export default class SquadServer extends EventEmitter {
     Logger.verbose('SquadServer', 1, `Updated layer information.`);
 
     this.updateLayerInformationTimeout = setTimeout(
-      this.updateLayerInformation,
-      this.updateLayerInformationInterval
+        this.updateLayerInformation,
+        this.updateLayerInformationInterval
     );
   }
 
@@ -508,8 +502,8 @@ export default class SquadServer extends EventEmitter {
     Logger.verbose('SquadServer', 1, `Updated A2S information.`);
 
     this.updateA2SInformationTimeout = setTimeout(
-      this.updateA2SInformation,
-      this.updateA2SInformationInterval
+        this.updateA2SInformation,
+        this.updateA2SInformationInterval
     );
   }
 
@@ -552,7 +546,7 @@ export default class SquadServer extends EventEmitter {
   async getSquadByID(teamID, squadID) {
     if (squadID === null) return null;
     return this.getSquadByCondition(
-      (squad) => squad.teamID === teamID && squad.squadID === squadID
+        (squad) => squad.teamID === teamID && squad.squadID === squadID
     );
   }
 
@@ -601,15 +595,15 @@ export default class SquadServer extends EventEmitter {
 
       if (data.error)
         Logger.verbose(
-          'SquadServer',
-          1,
-          `Successfully pinged the SquadJS API. Got back error: ${data.error}`
+            'SquadServer',
+            1,
+            `Successfully pinged the SquadJS API. Got back error: ${data.error}`
         );
       else
         Logger.verbose(
-          'SquadServer',
-          1,
-          `Successfully pinged the SquadJS API. Got back message: ${data.message}`
+            'SquadServer',
+            1,
+            `Successfully pinged the SquadJS API. Got back message: ${data.message}`
         );
     } catch (err) {
       Logger.verbose('SquadServer', 1, 'Failed to ping the SquadJS API: ', err.message);
