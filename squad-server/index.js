@@ -263,7 +263,8 @@ export default class SquadServer extends EventEmitter {
     this.logParser.on('PLAYER_DIED', async (data) => {
       console.log(data);
       data.victim = await this.getPlayerByName(data.victimName);
-      data.attacker = await this.getPlayerByController(data.attackerPlayerController)
+      data.attacker = await this.getPlayerByName(data.attackerName);
+      data.attacker = await this.getPlayerByController(data.attackerPlayerController);
 
       if (data.victim && data.attacker)
         data.teamkill =
