@@ -12,3 +12,4 @@ yarn.lock
 # IDEs
 .idea/
 .vs/
+/squad-server/plugins/db-log-addOn.js
