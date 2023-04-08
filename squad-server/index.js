@@ -208,7 +208,9 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('PLAYER_CONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
-      if (data.player) data.player.suffix = data.playerSuffix;
+      if (data.player) {
+        data.player.suffix = data.playerSuffix;
+      }
       else{
         data.player = {
           steamID: data.steamID,
@@ -247,15 +249,12 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('PLAYER_WOUNDED', async (data) => {
       data.victim = await this.getPlayerByName(data.victimName);
-      data.attacker = await this.getPlayerByName(data.attackerName);
+      data.attacker = await this.getPlayerByController(data.attackerPlayerController);
 
       if (data.victim && data.attacker)
         data.teamkill =
             data.victim.teamID === data.attacker.teamID &&
             data.victim.steamID !== data.attacker.steamID;
-
-      delete data.victimName;
-      delete data.attackerName;
 
       this.emit('PLAYER_WOUNDED', data);
       if (data.teamkill) this.emit('TEAMKILL', data);
@@ -264,14 +263,12 @@ export default class SquadServer extends EventEmitter {
     this.logParser.on('PLAYER_DIED', async (data) => {
       console.log(data);
       data.victim = await this.getPlayerByName(data.victimName);
+      data.attacker = await this.getPlayerByController(data.attackerPlayerController)
 
       if (data.victim && data.attacker)
         data.teamkill =
             data.victim.teamID === data.attacker.teamID &&
             data.victim.steamID !== data.attacker.steamID;
-
-      delete data.victimName;
-      delete data.attackerName;
 
       console.log(data);
 
@@ -360,6 +357,7 @@ export default class SquadServer extends EventEmitter {
         players.push({
           ...oldPlayerInfo[player.steamID],
           ...player,
+          playercont: this.logParser.eventStore.players[player.steamID].controller,
           squad: await this.getSquadByID(player.teamID, player.squadID)
         });
 
@@ -560,6 +558,10 @@ export default class SquadServer extends EventEmitter {
 
   async getPlayerByNameSuffix(suffix, forceUpdate) {
     return this.getPlayerByCondition((player) => player.suffix === suffix, forceUpdate, false);
+  }
+
+  async getPlayerByController(controller, forceUpdate){
+    return this.getPlayerByCondition((player) => player.playercont === controller, forceUpdate);
   }
 
   async pingSquadJSAPI() {
