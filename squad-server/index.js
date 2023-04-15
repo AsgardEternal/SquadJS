@@ -196,7 +196,7 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.logParser.on('NEW_GAME', async (data) => {
-      data.layer = await Layers.getLayerByClassname(data.layerClassname);
+      data.layer = await Layers.getLayerById(data.layerClassname);
 
       this.layerHistory.unshift({ layer: data.layer, time: data.time });
       this.layerHistory = this.layerHistory.slice(0, this.layerHistoryMaxLength);
@@ -424,7 +424,7 @@ export default class SquadServer extends EventEmitter {
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
 
       let currentLayer = await Layers.getLayerByName(currentMap.layer);
-      if(!currentLayer) currentLayer = await Layers.getLayerByClassname(currentMap.layer);
+      if(!currentLayer) currentLayer = await Layers.getLayerById(currentMap.layer);
       if(!currentLayer){
         if(currentMap.level === "Jensens") currentLayer = await Layers.getLayerByName("Jensen's Training Range");
       }
