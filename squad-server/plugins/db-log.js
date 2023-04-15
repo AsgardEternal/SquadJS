@@ -61,9 +61,6 @@ export default class DBLog extends BasePlugin {
         primaryKey: true,
         autoIncrement: true
       },
-      dlc: {
-        type: DataTypes.STRING
-      },
       mapClassname: {
         type: DataTypes.STRING
       },
@@ -76,6 +73,9 @@ export default class DBLog extends BasePlugin {
       layer: {
         type: DataTypes.STRING
       },
+      seedLayer: {
+        type: DataTypes.BOOLEAN
+      },
       startTime: {
         type: DataTypes.DATE,
         notNull: true
@@ -83,8 +83,23 @@ export default class DBLog extends BasePlugin {
       endTime: {
         type: DataTypes.DATE
       },
-      winner: {
+      winnerId: {
+        type: DataTypes.INTEGER
+      },
+      winnerFaction: {
         type: DataTypes.STRING
+      },
+      winnerTickets: {
+        type: DataTypes.INTEGER
+      },
+      loserId: {
+        type: DataTypes.INTEGER
+      },
+      loserFaction: {
+        type: DataTypes.STRING
+      },
+      loserTickets: {
+        type: DataTypes.INTEGER
       }
     });
 
@@ -472,24 +487,38 @@ export default class DBLog extends BasePlugin {
 
   async onNewGame(info) {
     await this.models.Match.update(
-      { endTime: info.time, winner: info.winner },
+      { endTime: info.time,
+        winnerId: null,
+        winnerFaction: info.winner,
+        winnerTickets: null,
+        loserId: null,
+        loserFaction: null,
+        loserTickets: 0
+      },
       { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }
     );
 
     this.match = await this.models.Match.create({
       server: this.options.overrideServerID || this.server.id,
-      dlc: info.dlc,
       mapClassname: info.mapClassname,
       layerClassname: info.layerClassname,
       map: info.layer ? info.layer.map.name : null,
       layer: info.layer ? info.layer.name : null,
+      seedLayer: null,
       startTime: info.time
     });
   }
 
   async onRoundEnd(info){
     await this.models.Match.update(
-        { endTime: info.time, winner: info.winnerFaction },
+        { endTime: info.time,
+          winnerId: info.winnerId,
+          winnerFaction: info.winnerFaction,
+          winnerTickets: info.winnerTickets,
+          loserId: info.loserId,
+          loserFaction: info.loserFaction,
+          loserTickets: info.loserTickets,
+        },
         { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }
     );
   }
