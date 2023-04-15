@@ -206,6 +206,25 @@ export default class SquadServer extends EventEmitter {
       this.emit('NEW_GAME', data);
     });
 
+    this.logParser.on('ROUND_ENDED', async (data) => {
+      const datalayer = await Layers.getLayerById(data.winner.layer);
+      const outdata = {
+        rawData: data,
+        rawLayer: data.winner.layer,
+        rawLevel: data.winner.level,
+        time: data.time,
+        winnerId: data.winner.team,
+        winnerFaction: data.winner.faction,
+        winnerTickets: data.winner.tickets,
+        loserId: data.loser.team,
+        loserFaction: data.loser.faction,
+        loserTickets: data.loser.tickets,
+        layer: datalayer
+      };
+
+      this.emit("ROUND_ENDED", outdata);
+    })
+
     this.logParser.on('PLAYER_CONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (data.player) {

@@ -392,6 +392,7 @@ export default class DBLog extends BasePlugin {
     this.onTickRate = this.onTickRate.bind(this);
     this.onUpdatedA2SInformation = this.onUpdatedA2SInformation.bind(this);
     this.onNewGame = this.onNewGame.bind(this);
+    this.onRoundEnd = this.onRoundEnd.bind(this);
     this.onPlayerNameChange = this.onPlayerNameChange.bind(this);
     this.onPlayerWounded = this.onPlayerWounded.bind(this);
     this.onPlayerDied = this.onPlayerDied.bind(this);
@@ -426,6 +427,7 @@ export default class DBLog extends BasePlugin {
     this.server.on('TICK_RATE', this.onTickRate);
     this.server.on('UPDATED_A2S_INFORMATION', this.onUpdatedA2SInformation);
     this.server.on('NEW_GAME', this.onNewGame);
+    this.server.on('ROUND_ENDED', this.onRoundEnd);
     this.server.on('PLAYER_NAME_CHANGE', this.onPlayerNameChange);
     this.server.on('PLAYER_WOUNDED', this.onPlayerWounded);
     this.server.on('PLAYER_DIED', this.onPlayerDied);
@@ -442,6 +444,7 @@ export default class DBLog extends BasePlugin {
     this.server.removeEventListener('TICK_RATE', this.onTickRate);
     this.server.removeEventListener('UPDATED_A2S_INFORMATION', this.onTickRate);
     this.server.removeEventListener('NEW_GAME', this.onNewGame);
+    this.server.removeEventListener('ROUND_ENDED', this.onRoundEnd);
     this.server.removeEventListener('PLAYER_NAME_CHANGE', this.onPlayerNameChange);
     this.server.removeEventListener('PLAYER_WOUNDED', this.onPlayerWounded);
     this.server.removeEventListener('PLAYER_DIED', this.onPlayerDied);
@@ -482,6 +485,13 @@ export default class DBLog extends BasePlugin {
       layer: info.layer ? info.layer.name : null,
       startTime: info.time
     });
+  }
+
+  async onRoundEnd(info){
+    await this.models.Match.update(
+        { endTime: info.time, winner: info.winnerFaction },
+        { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }
+    );
   }
   
   async onPlayerNameChange(info) {
