@@ -6,19 +6,23 @@ import Layer from './layer.js';
 
 class Layers {
   constructor() {
-    this.layers = [];
+    this._layers = new Map();
 
     this.pulled = false;
+  }
+  
+  get layers(){
+    return [...this._layers.values()]
   }
 
   async pull(force = false) {
     if (this.pulled && !force) {
       Logger.verbose('Layers', 2, 'Already pulled layers.');
-      return;
+      return this.layers;
     }
     if (force) Logger.verbose('Layers', 1, 'Forcing update to layer information...');
 
-    this.layers = [];
+    this._layers = new Map();
 
     Logger.verbose('Layers', 1, 'Pulling layers...');
     const response = await axios.post( // Change get to post for mod support
@@ -30,7 +34,8 @@ class Layers {
 //     );
 
     for (const layer of response.data.Maps) {
-      this.layers.push(new Layer(layer));
+      const newLayer = new Layer(layer);
+      this._layers.set(newLayer.layerid, newLayer);
     }
 
     Logger.verbose('Layers', 1, `Pulled ${this.layers.length} layers.`);
@@ -47,6 +52,11 @@ class Layers {
     if (matches.length >= 1) return matches[0];
 
     return null;
+  }
+  
+  async getLayerById(layerId){
+    await this.pull();
+    return this._layers.get(layerId) ?? null;
   }
 
   getLayerByName(name) {
