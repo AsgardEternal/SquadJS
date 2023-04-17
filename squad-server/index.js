@@ -375,22 +375,12 @@ export default class SquadServer extends EventEmitter {
 
       const players = [];
       for (const player of await this.rcon.getListPlayers()){
-        if(this.logParser.eventStore.players[player.steamID] && this.logParser.eventStore.players[player.steamID].controller){
           players.push({
             ...oldPlayerInfo[player.steamID],
             ...player,
-            playercont: this.logParser.eventStore.players[player.steamID].controller,
+            playercont: this.logParser.eventStore.players[player.steamID] ? this.logParser.eventStore.players[player.steamID].controller : null,
             squad: await this.getSquadByID(player.teamID, player.squadID)
           });
-        }else{
-          Logger.verbose('SquadServer', 1, `Failed to find a player controller`)
-          players.push({
-            ...oldPlayerInfo[player.steamID],
-            ...player,
-            playercont: null,
-            squad: await this.getSquadByID(player.teamID, player.squadID)
-          });
-        }
       }
 
       this.players = players;
