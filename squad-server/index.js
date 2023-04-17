@@ -378,7 +378,7 @@ export default class SquadServer extends EventEmitter {
         players.push({
           ...oldPlayerInfo[player.steamID],
           ...player,
-          playercont: this.logParser.eventStore.players[player.steamID].controller,
+          playercont: this.logParser.eventStore.players[player.steamID] ? this.logParser.eventStore.players[player.steamID].controller : null,
           squad: await this.getSquadByID(player.teamID, player.squadID)
         });
 
