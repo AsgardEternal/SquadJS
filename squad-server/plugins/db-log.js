@@ -471,6 +471,7 @@ export default class DBLog extends BasePlugin {
   }
 
   async onNewGame(info) {
+    this.verbose(1, "New Game")
     await this.models.Match.update(
       { endTime: info.time, winner: info.winner },
       { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }
@@ -488,6 +489,7 @@ export default class DBLog extends BasePlugin {
   }
 
   async onRoundEnd(info){
+    this.verbose(1, "Round End");
     await this.models.Match.update(
         { endTime: info.time, winner: info.winnerFaction },
         { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }

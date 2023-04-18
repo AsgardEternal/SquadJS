@@ -325,10 +325,6 @@ export default class SquadServer extends EventEmitter {
       this.emit('PLAYER_UNPOSSESS', data);
     });
 
-    this.logParser.on('ROUND_ENDED', async (data) => {
-      this.emit('ROUND_ENDED', data);
-    });
-
     this.logParser.on('TICK_RATE', (data) => {
       this.emit('TICK_RATE', data);
     });
