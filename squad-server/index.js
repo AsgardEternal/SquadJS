@@ -210,15 +210,15 @@ export default class SquadServer extends EventEmitter {
       const datalayer = await Layers.getLayerById(data.winner.layer);
       const outdata = {
         rawData: data,
-        rawLayer: data.winner.layer,
-        rawLevel: data.winner.level,
+        rawLayer: data.winner ? data.winner.layer : null,
+        rawLevel: data.winner ? data.winner.level : null,
         time: data.time,
-        winnerId: data.winner.team,
-        winnerFaction: data.winner.faction,
-        winnerTickets: data.winner.tickets,
-        loserId: data.loser.team,
-        loserFaction: data.loser.faction,
-        loserTickets: data.loser.tickets,
+        winnerId: data.winner ? data.winner.team : null,
+        winnerFaction: data.winner ? data.winner.faction : null,
+        winnerTickets: data.winner ? data.winner.tickets : null,
+        loserId: data.loser ? data.loser.team : null,
+        loserFaction: data.loser ? data.loser.faction : null,
+        loserTickets: data.loser ? data.loser.tickets : null,
         layer: datalayer
       };
 

@@ -39,7 +39,7 @@ export default class AutoTKWarn extends BasePlugin {
   }
 
   async onTeamkill(info) {
-    const displaymsg = true;
+    let displaymsg = true;
     if(this.server.currentLayer){
       if(this.server.currentLayer.gamemode === "Seed") displaymsg = false;
       if(this.server.currentLayer.gamemode === "Training") displaymsg = false;
