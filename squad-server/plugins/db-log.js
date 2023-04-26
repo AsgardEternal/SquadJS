@@ -138,6 +138,9 @@ export default class DBLog extends BasePlugin {
         },
         lastName: {
           type: DataTypes.STRING
+        },
+        discordID: {
+          type: DataTypes.BIGINT
         }
       },
       {
@@ -421,7 +424,7 @@ export default class DBLog extends BasePlugin {
       id: this.options.overrideServerID || this.server.id,
       name: this.server.serverName
     });
-    
+
     await this.repairDB();
 
     this.server.on('TICK_RATE', this.onTickRate);
@@ -433,7 +436,7 @@ export default class DBLog extends BasePlugin {
     this.server.on('PLAYER_DIED', this.onPlayerDied);
     this.server.on('PLAYER_REVIVED', this.onPlayerRevived);
   }
-  
+
   async repairDB() {
     this.match = await this.models.Match.findOne({
       where: { server: this.options.overrideServerID || this.server.id, endTime: null }
@@ -471,7 +474,7 @@ export default class DBLog extends BasePlugin {
   }
 
   async onNewGame(info) {
-    this.verbose(1, "New Game")
+    this.verbose(1, 'New Game');
     await this.models.Match.update(
       { endTime: info.time, winner: info.winner },
       { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }
@@ -488,16 +491,16 @@ export default class DBLog extends BasePlugin {
     });
   }
 
-  async onRoundEnd(info){
-    this.verbose(1, "Round End");
+  async onRoundEnd(info) {
+    this.verbose(1, 'Round End');
     await this.models.Match.update(
-        { endTime: info.time, winner: info.winnerFaction },
-        { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }
+      { endTime: info.time, winner: info.winnerFaction },
+      { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }
     );
   }
-  
+
   async onPlayerNameChange(info) {
-    if(info.player)
+    if (info.player)
       await this.models.SteamUser.upsert({
         steamID: info.player.steamID,
         lastName: info.player.name
