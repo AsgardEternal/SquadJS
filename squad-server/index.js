@@ -197,7 +197,7 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.logParser.on('NEW_GAME', async (data) => {
-      data.layer = await Layers.getLayerById(data.layerClassname);
+      data.layer = await Layers.getLayerByClassname(data.layerClassname);
 
       this.layerHistory.unshift({ layer: data.layer, time: data.time });
       this.layerHistory = this.layerHistory.slice(0, this.layerHistoryMaxLength);
@@ -449,6 +449,8 @@ export default class SquadServer extends EventEmitter {
         if (currentMap.level === "Jensen's")
           currentLayer = await Layers.getLayerById('Jensens_Range_ADF-PLA');
       }
+      if (currentLayer) Logger.verbose('SquadServer', 1, 'Found Current layer');
+      else Logger.verbose('SquadServer', 1, 'WARNING: Could not find layer from RCON');
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
 
       if (this.layerHistory.length === 0) {
