@@ -208,7 +208,7 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.logParser.on('ROUND_ENDED', async (data) => {
-      const datalayer = await Layers.getLayerById(data.winner.layer);
+      const datalayer = data.winner.layer ? await Layers.getLayerById(data.winner.layer) : null;
       const outdata = {
         rawData: data,
         rawLayer: data.winner ? data.winner.layer : null,
