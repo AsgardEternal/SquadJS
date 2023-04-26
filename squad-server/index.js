@@ -445,6 +445,7 @@ export default class SquadServer extends EventEmitter {
 
       let currentLayer = await Layers.getLayerByName(currentMap.layer);
       if (!currentLayer) currentLayer = await Layers.getLayerById(currentMap.layer);
+      if (!currentLayer) currentLayer = await Layers.getLayerByClassname(currentMap.layer);
       if (!currentLayer) {
         if (currentMap.level === "Jensen's")
           currentLayer = await Layers.getLayerById('Jensens_Range_ADF-PLA');

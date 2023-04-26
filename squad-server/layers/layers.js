@@ -66,7 +66,10 @@ class Layers {
   }
 
   getLayerByClassname(classname) {
-    return this.getLayerByCondition((layer) => layer.classname === classname);
+    return this.getLayerByCondition(
+      (layer) =>
+        layer.classname.replace(/_/, '').toLowerCase() === classname.replace(/_/, '').toLowerCase()
+    );
   }
 }
 
