@@ -533,7 +533,7 @@ export default class SquadServer extends EventEmitter {
     await Layers.pull();
 
     // grab layers actually available through rcon
-    const rconRaw = (await this.server.rcon.execute('ListLayers'))?.split('\n') || [];
+    const rconRaw = (await this.rcon.execute('ListLayers'))?.split('\n') || [];
     // take out first result, not actual layer just a header
     rconRaw.shift();
 
