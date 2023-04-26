@@ -78,6 +78,13 @@
       ]
     },
     {
+      "plugin": "DBLogPlayerTime",
+      "enabled": false,
+      "database": "mysql",
+      "overrideServerID": null,
+      "seedingThreshold": 50
+    },
+    {
       "plugin": "DBLog",
       "enabled": false,
       "database": "mysql",

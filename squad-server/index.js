@@ -63,9 +63,9 @@ export default class SquadServer extends EventEmitter {
 
   async watch() {
     Logger.verbose(
-        'SquadServer',
-        1,
-        `Beginning to watch ${this.options.host}:${this.options.queryPort}...`
+      'SquadServer',
+      1,
+      `Beginning to watch ${this.options.host}:${this.options.queryPort}...`
     );
 
     await Layers.pull();
@@ -73,6 +73,7 @@ export default class SquadServer extends EventEmitter {
     this.admins = await fetchAdminLists(this.options.adminLists);
 
     await this.rcon.connect();
+    await this.updateLayerList();
     await this.logParser.watch();
 
     await this.updateSquadList();
@@ -176,11 +177,11 @@ export default class SquadServer extends EventEmitter {
 
   setupLogParser() {
     this.logParser = new LogParser(
-        Object.assign(this.options.ftp, {
-          mode: this.options.logReaderMode,
-          logDir: this.options.logDir,
-          host: this.options.ftp.host || this.options.host
-        })
+      Object.assign(this.options.ftp, {
+        mode: this.options.logReaderMode,
+        logDir: this.options.logDir,
+        host: this.options.ftp.host || this.options.host
+      })
     );
 
     this.logParser.on('ADMIN_BROADCAST', (data) => {
@@ -222,19 +223,18 @@ export default class SquadServer extends EventEmitter {
         layer: datalayer
       };
 
-      this.emit("ROUND_ENDED", outdata);
-    })
+      this.emit('ROUND_ENDED', outdata);
+    });
 
     this.logParser.on('PLAYER_CONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (data.player) {
         data.player.suffix = data.playerSuffix;
-      }
-      else{
+      } else {
         data.player = {
           steamID: data.steamID,
           name: data.playerSuffix
-        }
+        };
       }
 
       this.emit('PLAYER_CONNECTED', data);
@@ -242,10 +242,10 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
-      if(!data.player){
+      if (!data.player) {
         data.player = {
           steamID: data.steamID
-        }
+        };
       }
 
       this.emit('PLAYER_DISCONNECTED', data);
@@ -257,8 +257,8 @@ export default class SquadServer extends EventEmitter {
 
       if (data.victim && data.attacker)
         data.teamkill =
-            data.victim.teamID === data.attacker.teamID &&
-            data.victim.steamID !== data.attacker.steamID;
+          data.victim.teamID === data.attacker.teamID &&
+          data.victim.steamID !== data.attacker.steamID;
 
       delete data.victimName;
       delete data.attackerName;
@@ -269,12 +269,13 @@ export default class SquadServer extends EventEmitter {
     this.logParser.on('PLAYER_WOUNDED', async (data) => {
       data.victim = await this.getPlayerByName(data.victimName);
       data.attacker = await this.getPlayerByName(data.attackerName);
-      if(!data.attacker) data.attacker = await this.getPlayerByController(data.attackerPlayerController);
+      if (!data.attacker)
+        data.attacker = await this.getPlayerByController(data.attackerPlayerController);
 
       if (data.victim && data.attacker)
         data.teamkill =
-            data.victim.teamID === data.attacker.teamID &&
-            data.victim.steamID !== data.attacker.steamID;
+          data.victim.teamID === data.attacker.teamID &&
+          data.victim.steamID !== data.attacker.steamID;
 
       this.emit('PLAYER_WOUNDED', data);
       if (data.teamkill) this.emit('TEAMKILL', data);
@@ -284,12 +285,13 @@ export default class SquadServer extends EventEmitter {
       console.log(data);
       data.victim = await this.getPlayerByName(data.victimName);
       data.attacker = await this.getPlayerByName(data.attackerName);
-      if(!data.attacker) data.attacker = await this.getPlayerByController(data.attackerPlayerController);
+      if (!data.attacker)
+        data.attacker = await this.getPlayerByController(data.attackerPlayerController);
 
       if (data.victim && data.attacker)
         data.teamkill =
-            data.victim.teamID === data.attacker.teamID &&
-            data.victim.steamID !== data.attacker.steamID;
+          data.victim.teamID === data.attacker.teamID &&
+          data.victim.steamID !== data.attacker.steamID;
 
       console.log(data);
 
@@ -370,13 +372,15 @@ export default class SquadServer extends EventEmitter {
       }
 
       const players = [];
-      for (const player of await this.rcon.getListPlayers()){
-          players.push({
-            ...oldPlayerInfo[player.steamID],
-            ...player,
-            playercont: this.logParser.eventStore.players[player.steamID] ? this.logParser.eventStore.players[player.steamID].controller : null,
-            squad: await this.getSquadByID(player.teamID, player.squadID)
-          });
+      for (const player of await this.rcon.getListPlayers()) {
+        players.push({
+          ...oldPlayerInfo[player.steamID],
+          ...player,
+          playercont: this.logParser.eventStore.players[player.steamID]
+            ? this.logParser.eventStore.players[player.steamID].controller
+            : null,
+          squad: await this.getSquadByID(player.teamID, player.squadID)
+        });
       }
 
       this.players = players;
@@ -440,9 +444,10 @@ export default class SquadServer extends EventEmitter {
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
 
       let currentLayer = await Layers.getLayerByName(currentMap.layer);
-      if(!currentLayer) currentLayer = await Layers.getLayerById(currentMap.layer);
-      if(!currentLayer){
-        if(currentMap.level === "Jensens") currentLayer = await Layers.getLayerByName("Jensen's Training Range");
+      if (!currentLayer) currentLayer = await Layers.getLayerById(currentMap.layer);
+      if (!currentLayer) {
+        if (currentMap.level === 'Jensens')
+          currentLayer = await Layers.getLayerByName("Jensen's Training Range");
       }
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
 
@@ -464,8 +469,8 @@ export default class SquadServer extends EventEmitter {
     Logger.verbose('SquadServer', 1, `Updated layer information.`);
 
     this.updateLayerInformationTimeout = setTimeout(
-        this.updateLayerInformation,
-        this.updateLayerInformationInterval
+      this.updateLayerInformation,
+      this.updateLayerInformationInterval
     );
   }
 
@@ -518,9 +523,86 @@ export default class SquadServer extends EventEmitter {
     Logger.verbose('SquadServer', 1, `Updated A2S information.`);
 
     this.updateA2SInformationTimeout = setTimeout(
-        this.updateA2SInformation,
-        this.updateA2SInformationInterval
+      this.updateA2SInformation,
+      this.updateA2SInformationInterval
     );
+  }
+
+  async updateLayerList() {
+    // update expected list from http source
+    await Layers.pull();
+
+    // grab layers actually available through rcon
+    const rconRaw = (await this.server.rcon.execute('ListLayers'))?.split('\n') || [];
+    // take out first result, not actual layer just a header
+    rconRaw.shift();
+
+    // filter out raw result from RCON, modded layers have a suffix that needs filtering
+    const rconLayers = [];
+    for (const raw of rconRaw) {
+      rconLayers.push(raw.split(' ')[0]);
+    }
+
+    // go through http layers and delete any that don't show up in rcon
+    for (const layer of Layers.layers) {
+      if (!rconLayers.find((e) => e === layer.layerid)) Layers._layers.delete(layer.layerid);
+    }
+
+    // add layers that are in RCON that we did not find in the http list
+    for (const layer of rconLayers) {
+      if (!Layers.layers.find((e) => e?.layerid === layer)) {
+        const newLayer = this.mapLayer(layer);
+        if (!newLayer) continue;
+
+        Layers._layers.set(newLayer.layerid, newLayer);
+      }
+    }
+  }
+
+  // helper for updateLayerList
+  mapLayer(layid) {
+    layid = layid.replace(/[^a-z_\d]/gi, '');
+    const gl =
+      /((?<mod>[a-zA-Z0-9]+)_)?(?<level>[a-zA-Z0-9]+)_(?<gamemode>[a-zA-Z0-9]+)_(?<version>[a-zA-Z0-9]+)(_(?<team1>[a-zA-Z0-9]+)v(?<team2>[a-zA-Z0-9]+))?/.exec(
+        layid
+      )?.groups;
+    if (!gl) return;
+
+    const teams = [];
+    // eslint-disable-next-line no-unused-vars
+    for (const t of ['team1', 'team2']) {
+      teams.push({
+        tickets: 0,
+        commander: false,
+        vehicles: [],
+        numberOfTanks: 0,
+        numberOfHelicopters: 0
+      });
+    }
+    teams[0].faction = gl.team1 ? gl.team1 : 'Unknown';
+    teams[0].name = gl.team1 ? gl.team1 : 'Unknown';
+    teams[1].faction = gl.team2 ? gl.team2 : 'Unknown';
+    teams[1].name = gl.team2 ? gl.team2 : 'Unknown';
+
+    return {
+      name: layid.replace(/_/g, ' '),
+      classname: gl.level,
+      layerid: layid,
+      map: {
+        name: gl.level
+      },
+      gamemode: gl.gamemode,
+      gamemodeType: gl.gamemode,
+      version: gl.version,
+      size: '0.0x0.0 km',
+      sizeType: 'Playable Area',
+      numberOfCapturePoints: 0,
+      lighting: {
+        name: 'Unknown',
+        classname: 'Unknown'
+      },
+      teams: teams
+    };
   }
 
   async getPlayerByCondition(condition, forceUpdate = false, retry = true) {
@@ -562,7 +644,7 @@ export default class SquadServer extends EventEmitter {
   async getSquadByID(teamID, squadID) {
     if (squadID === null) return null;
     return this.getSquadByCondition(
-        (squad) => squad.teamID === teamID && squad.squadID === squadID
+      (squad) => squad.teamID === teamID && squad.squadID === squadID
     );
   }
 
@@ -578,7 +660,7 @@ export default class SquadServer extends EventEmitter {
     return this.getPlayerByCondition((player) => player.suffix === suffix, forceUpdate, false);
   }
 
-  async getPlayerByController(controller, forceUpdate){
+  async getPlayerByController(controller, forceUpdate) {
     return this.getPlayerByCondition((player) => player.playercont === controller, forceUpdate);
   }
 
@@ -615,15 +697,15 @@ export default class SquadServer extends EventEmitter {
 
       if (data.error)
         Logger.verbose(
-            'SquadServer',
-            1,
-            `Successfully pinged the SquadJS API. Got back error: ${data.error}`
+          'SquadServer',
+          1,
+          `Successfully pinged the SquadJS API. Got back error: ${data.error}`
         );
       else
         Logger.verbose(
-            'SquadServer',
-            1,
-            `Successfully pinged the SquadJS API. Got back message: ${data.message}`
+          'SquadServer',
+          1,
+          `Successfully pinged the SquadJS API. Got back message: ${data.message}`
         );
     } catch (err) {
       Logger.verbose('SquadServer', 1, 'Failed to ping the SquadJS API: ', err.message);

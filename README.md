@@ -308,6 +308,28 @@ Interested in creating your own plugin? [See more here](./squad-server/plugins/r
         </details>
 
 <details>
+          <summary>DBLogPlayerTime</summary>
+          <h2>DBLogPlayerTime</h2>
+          <p>replacement add-on to dblog for player join/seeding times</p>
+          <h3>Options</h3>
+          <ul><li><h4>database (Required)</h4>
+           <h6>Description</h6>
+           <p>The Sequelize connector to log server information to.</p>
+           <h6>Default</h6>
+           <pre><code>mysql</code></pre></li>
+<li><h4>overrideServerID</h4>
+           <h6>Description</h6>
+           <p>A overridden server ID.</p>
+           <h6>Default</h6>
+           <pre><code>null</code></pre></li>
+<li><h4>seedingThreshold</h4>
+           <h6>Description</h6>
+           <p>seeding Threshold.</p>
+           <h6>Default</h6>
+           <pre><code>50</code></pre></li></ul>
+        </details>
+
+<details>
           <summary>DBLog</summary>
           <h2>DBLog</h2>
           <p>The <code>mysql-log</code> plugin will log various server statistics and events to a database. This is great for server performance monitoring and/or player stat tracking.
