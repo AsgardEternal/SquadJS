@@ -446,8 +446,8 @@ export default class SquadServer extends EventEmitter {
       let currentLayer = await Layers.getLayerByName(currentMap.layer);
       if (!currentLayer) currentLayer = await Layers.getLayerById(currentMap.layer);
       if (!currentLayer) {
-        if (currentMap.level === 'Jensens')
-          currentLayer = await Layers.getLayerByName("Jensen's Training Range");
+        if (currentMap.level === "Jensen's")
+          currentLayer = await Layers.getLayerById('Jensens_Range_ADF-PLA');
       }
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
 
@@ -457,6 +457,7 @@ export default class SquadServer extends EventEmitter {
       }
 
       this.currentLayerRcon = currentMap;
+      Logger.verbose('SquadServer', 1, 'Layer information found to be: ', currentMap.layer);
       this.currentLayer = currentLayer;
       this.nextLayer = nextLayer;
       this.nextLayerToBeVoted = nextMapToBeVoted;
@@ -592,6 +593,7 @@ export default class SquadServer extends EventEmitter {
       name: layid.replace(/_/g, ' '),
       classname: gl.level,
       layerid: layid,
+      modName: gl.mod ? gl.mod : 'Vanilla',
       map: {
         name: gl.level
       },
