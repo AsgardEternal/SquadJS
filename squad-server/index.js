@@ -557,6 +557,10 @@ export default class SquadServer extends EventEmitter {
         Layers._layers.set(newLayer.layerid, newLayer);
       }
     }
+
+    for (const layer of Layers.layers) {
+      Logger.verbose('LayerUpdater', 1, 'Found layer: ', layer.layerid);
+    }
   }
 
   // helper for updateLayerList
