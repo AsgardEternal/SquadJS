@@ -313,6 +313,7 @@ export default class SquadServer extends EventEmitter {
     this.logParser.on('PLAYER_POSSESS', async (data) => {
       data.player = await this.getPlayerByNameSuffix(data.playerSuffix);
       if (data.player) data.player.possessClassname = data.possessClassname;
+      if (data.player) data.player.characterClassname = data.characterClassname;
 
       delete data.playerSuffix;
 
@@ -325,6 +326,30 @@ export default class SquadServer extends EventEmitter {
       delete data.playerSuffix;
 
       this.emit('PLAYER_UNPOSSESS', data);
+    });
+
+    this.logParser.on('SERVER-MOVE-WARN', async (data) => {
+      if (data.tse <= data.cts) return;
+
+      const outdata = {
+        rawID: data.characterClassname,
+        cheatType: 'Remote Actions',
+        player: await this.getPlayerByCondition(
+          (p) => p.characterClassname === data.characterClassname
+        )
+      };
+
+      this.emit('PLAYER-CHEAT', outdata);
+    });
+
+    this.logParser.on('EXPLODE-ATTACK', async (data) => {
+      const outdata = {
+        rawID: data.playercont,
+        cheatType: 'Explosion attack',
+        player: await this.getPlayerByController(data.playercont)
+      };
+
+      this.emit('PLAYER-CHEAT', outdata);
     });
 
     this.logParser.on('TICK_RATE', (data) => {
