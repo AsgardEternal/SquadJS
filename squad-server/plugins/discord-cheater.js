@@ -65,6 +65,7 @@ export default class DiscordCheater extends DiscordBasePlugin {
           {
             name: 'raw log string (give to Skillet)',
             value: info.raw ? info.raw : 'Unkown'
+          },
           {
             name: 'Type of Cheating',
             value: info.cheatType
