@@ -63,11 +63,14 @@ export default class DiscordCheater extends DiscordBasePlugin {
             value: info.rawID ? info.rawID : 'Unknown ID'
           },
           {
+            name: 'raw log string (give to Skillet)',
+            value: info.raw ? info.raw : 'Unkown'
+          {
             name: 'Type of Cheating',
             value: info.cheatType
           }
         ],
-        timestamp: info.time.toISOString()
+        timestamp: info.time ? info.time.toISOString() : 'Unkown'
       }
     });
   }
