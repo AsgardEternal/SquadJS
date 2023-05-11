@@ -7,7 +7,7 @@ export default {
       if (logParser.eventStore.session['last-move-chain'] === args[2]) return;
     }
 
-    logParser.eventStore.session['last-move-character'] = args[2];
+    logParser.eventStore.session['last-move-chain'] = args[2];
 
     const data = {
       raw: args[0],
