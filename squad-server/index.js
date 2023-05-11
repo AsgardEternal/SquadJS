@@ -334,10 +334,10 @@ export default class SquadServer extends EventEmitter {
       const outdata = {
         raw: data.raw,
         time: data.time,
-        rawID: data.characterClassname,
+        rawID: data.characterName,
         cheatType: 'Remote Actions',
         player: await this.getPlayerByCondition(
-          (p) => p.characterClassname === data.characterClassname
+          (p) => p.characterClassname === data.characterName
         )
       };
 
