@@ -338,7 +338,9 @@ export default class SquadServer extends EventEmitter {
         cheatType: 'Remote Actions',
         player: await this.getPlayerByCondition(
           (p) => p.characterClassname === data.characterName
-        )
+        ),
+        probcheat: data.cts < 2 ? "unlikely" : null,
+        probcolor: data.cts < 2 ? 0xffff00 : null
       };
 
       this.emit('PLAYER-CHEAT', outdata);
