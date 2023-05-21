@@ -332,11 +332,15 @@ export default class SquadServer extends EventEmitter {
       if (data.tse <= data.cts) return;
 
       const outdata = {
-        rawID: data.characterClassname,
+        raw: data.raw,
+        time: data.time,
+        rawID: data.characterName,
         cheatType: 'Remote Actions',
         player: await this.getPlayerByCondition(
-          (p) => p.characterClassname === data.characterClassname
-        )
+          (p) => p.characterClassname === data.characterName
+        ),
+        probcheat: data.cts < 2 ? "unlikely" : null,
+        probcolor: data.cts < 2 ? 0xffff00 : null
       };
 
       this.emit('PLAYER-CHEAT', outdata);
@@ -344,6 +348,8 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('EXPLODE-ATTACK', async (data) => {
       const outdata = {
+        raw: data.raw,
+        time: data.time,
         rawID: data.playercont,
         cheatType: 'Explosion attack',
         player: await this.getPlayerByController(data.playercont)

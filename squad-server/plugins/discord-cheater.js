@@ -21,7 +21,7 @@ export default class DiscordCheater extends DiscordBasePlugin {
       color: {
         required: false,
         description: 'The color of the embed.',
-        default: 16761867
+        default: 0xff0000
       }
     };
   }
@@ -44,7 +44,7 @@ export default class DiscordCheater extends DiscordBasePlugin {
     await this.sendDiscordMessage({
       embed: {
         title: 'Suspected Cheater',
-        color: this.options.color,
+        color: info.probcolor ? info.probcolor : this.options.color,
         fields: [
           {
             name: 'Player Name',
@@ -63,11 +63,20 @@ export default class DiscordCheater extends DiscordBasePlugin {
             value: info.rawID ? info.rawID : 'Unknown ID'
           },
           {
+            name: 'raw log string (give to Skillet)',
+            value: info.raw ? info.raw : 'Unkown'
+          },
+          {
             name: 'Type of Cheating',
             value: info.cheatType
+          },
+          {
+            name: 'Probibility of cheating',
+            value: info.probcheat ? info.probcheat : 'high',
+            inline: true
           }
         ],
-        timestamp: info.time.toISOString()
+        timestamp: info.time ? info.time.toISOString() : 'Unkown'
       }
     });
   }
