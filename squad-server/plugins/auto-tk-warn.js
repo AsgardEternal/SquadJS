@@ -40,12 +40,12 @@ export default class AutoTKWarn extends BasePlugin {
 
   async onTeamkill(info) {
     let displaymsg = true;
-    if(this.server.currentLayer){
-      if(this.server.currentLayer.gamemode === "Seed") displaymsg = false;
-      if(this.server.currentLayer.gamemode === "Training") displaymsg = false;
-    }else{
-      if(this.server.currentLayerRcon.layer.includes("Seed")) displaymsg = false;
-      if(this.server.currentLayerRcon.layer.includes("Training")) displaymsg = false;
+    if (this.server.currentLayer) {
+      if (this.server.currentLayer.gamemode === 'Seed') displaymsg = false;
+      if (this.server.currentLayer.gamemode === 'Training') displaymsg = false;
+    } else {
+      if (this.server.currentLayerRcon.layer.includes('Seed')) displaymsg = false;
+      if (this.server.currentLayerRcon.layer.includes('Training')) displaymsg = false;
     }
     if (info.attacker && this.options.attackerMessage && displaymsg) {
       this.server.rcon.warn(info.attacker.steamID, this.options.attackerMessage);

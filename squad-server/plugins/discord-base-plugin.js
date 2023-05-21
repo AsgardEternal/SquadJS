@@ -35,11 +35,11 @@ export default class DiscordBasePlugin extends BasePlugin {
 
     if (typeof message === 'object' && 'embed' in message)
       message.embed.footer = message.embed.footer || { text: COPYRIGHT_MESSAGE };
-    
+
     try {
       await this.channel.send(message);
     } catch (error) {
-      this.verbose(1,'discordjs cache error caught!');
+      this.verbose(1, 'discordjs cache error caught!');
     }
   }
 }
