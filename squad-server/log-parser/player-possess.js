@@ -7,8 +7,9 @@ export default {
       time: args[1],
       chainID: args[2],
       playerSuffix: args[3],
+      characterClassname: args[4],
       possessClassname: args[5],
-      characterClassname: args[4]
+      pawn: args[6]
     };
 
     logParser.eventStore.session[args[3]] = args[2];

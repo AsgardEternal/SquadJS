@@ -82,7 +82,10 @@
       "enabled": false,
       "database": "mysql",
       "overrideServerID": null,
-      "seedingThreshold": 50
+      "seedingThreshold": 50,
+      "whitelistfilepath": null,
+      "incseed": 0,
+      "decseed": 0
     },
     {
       "plugin": "DBLog",

@@ -326,7 +326,22 @@ Interested in creating your own plugin? [See more here](./squad-server/plugins/r
            <h6>Description</h6>
            <p>seeding Threshold.</p>
            <h6>Default</h6>
-           <pre><code>50</code></pre></li></ul>
+           <pre><code>50</code></pre></li>
+<li><h4>whitelistfilepath</h4>
+           <h6>Description</h6>
+           <p>path to a file to write out auto-wl</p>
+           <h6>Default</h6>
+           <pre><code>null</code></pre></li>
+<li><h4>incseed</h4>
+           <h6>Description</h6>
+           <p>rate of increase as a percentage to whitelist</p>
+           <h6>Default</h6>
+           <pre><code>0</code></pre></li>
+<li><h4>decseed</h4>
+           <h6>Description</h6>
+           <p>rate of decrease as a percentage to whitelist</p>
+           <h6>Default</h6>
+           <pre><code>0</code></pre></li></ul>
         </details>
 
 <details>
