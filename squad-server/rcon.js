@@ -151,7 +151,7 @@ export default class SquadRcon extends Rcon {
         name: match[3],
         teamID: match[4],
         squadID: match[5] !== 'N/A' ? match[5] : null,
-        isSquadLeader: match[6] === 'True' ? true : false,
+        isSquadLeader: match[6] === 'True',
         rconRole: match[7]
       });
     }
