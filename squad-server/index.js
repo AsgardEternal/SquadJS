@@ -208,7 +208,7 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.logParser.on('ROUND_ENDED', async (data) => {
-      const datalayer = data.winner.layer ? await Layers.getLayerById(data.winner.layer) : null;
+      const datalayer = data.winner ? await Layers.getLayerById(data.winner.layer) : null;
       const outdata = {
         rawData: data,
         rawLayer: data.winner ? data.winner.layer : null,
@@ -336,10 +336,8 @@ export default class SquadServer extends EventEmitter {
         time: data.time,
         rawID: data.characterName,
         cheatType: 'Remote Actions',
-        player: await this.getPlayerByCondition(
-          (p) => p.characterClassname === data.characterName
-        ),
-        probcheat: data.cts < 2 ? "unlikely" : null,
+        player: await this.getPlayerByCondition((p) => p.characterClassname === data.characterName),
+        probcheat: data.cts < 2 ? 'unlikely' : null,
         probcolor: data.cts < 2 ? 0xffff00 : null
       };
 
@@ -588,7 +586,7 @@ export default class SquadServer extends EventEmitter {
       if (!Layers.layers.find((e) => e?.layerid === layer)) {
         const newLayer = this.mapLayer(layer);
         if (!newLayer) continue;
-
+        Logger.verbose('LayerUpdater', 1, 'Created RCON Layer: ', newLayer);
         Layers._layers.set(newLayer.layerid, newLayer);
       }
     }

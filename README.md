@@ -539,7 +539,7 @@ Grafana:
            <h6>Description</h6>
            <p>The color of the embed.</p>
            <h6>Default</h6>
-           <pre><code>16761867</code></pre></li></ul>
+           <pre><code>16711680</code></pre></li></ul>
         </details>
 
 <details>
