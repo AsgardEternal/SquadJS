@@ -480,21 +480,23 @@ export default class SquadServer extends EventEmitter {
         if (currentMap.level === "Jensen's")
           currentLayer = await Layers.getLayerById('Jensens_Range_ADF-PLA');
       }
-      if (!currentLayer)
+      if (!currentLayer) {
+        const cleanrconmap = currentMap.layer.toLowerCase().replace(/[ _]/gi, '');
         currentLayer = await Layers.getLayerByCondition(
           (l) =>
-            currentMap.layer.toLowerCase().includes(l.map.name.toLowerCase()) &&
-            currentMap.layer.toLowerCase().includes(l.gamemode.toLowerCase()) &&
-            currentMap.layer.toLowerCase().includes(l.version.toLowerCase()) &&
-            currentMap.layer.toLowerCase().includes(l.modName.toLowerCase())
+            cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
+            cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
+            cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, '')) &&
+            cleanrconmap.includes(l.modName.toLowerCase().replace(/[ _]/gi, ''))
         );
-      if (!currentLayer)
-        currentLayer = await Layers.getLayerByCondition(
-          (l) =>
-            currentMap.layer.toLowerCase().includes(l.map.name.toLowerCase()) &&
-            currentMap.layer.toLowerCase().includes(l.gamemode.toLowerCase()) &&
-            currentMap.layer.toLowerCase().includes(l.version.toLowerCase())
-        );
+        if (!currentLayer)
+          currentLayer = await Layers.getLayerByCondition(
+            (l) =>
+              cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
+              cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
+              cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, ''))
+          );
+      }
       if (currentLayer) Logger.verbose('SquadServer', 1, 'Found Current layer');
       else Logger.verbose('SquadServer', 1, 'WARNING: Could not find layer from RCON');
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
