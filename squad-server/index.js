@@ -486,7 +486,7 @@ export default class SquadServer extends EventEmitter {
             currentMap.layer.toLowerCase().includes(l.map.name.toLowerCase()) &&
             currentMap.layer.toLowerCase().includes(l.gamemode.toLowerCase()) &&
             currentMap.layer.toLowerCase().includes(l.version.toLowerCase()) &&
-            currentMap.layer.toLowerCase().includes(l.mod.toLowerCase())
+            currentMap.layer.toLowerCase().includes(l.modName.toLowerCase())
         );
       if (!currentLayer)
         currentLayer = await Layers.getLayerByCondition(
