@@ -330,7 +330,7 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('SERVER-MOVE-WARN', async (data) => {
       const tsd = data.tse - data.cts;
-      if (235 > tsd && tsd > 0) return;
+      if (tsd < 235 && tsd > 0) return;
 
       const outdata = {
         raw: data.raw,
@@ -593,7 +593,7 @@ export default class SquadServer extends EventEmitter {
     }
 
     for (const layer of Layers.layers) {
-      Logger.verbose('LayerUpdater', 1, 'Found layer: ', layer.layerid);
+      Logger.verbose('LayerUpdater', 1, 'Found layer: ', layer.layerid, ' - ', layer.name);
     }
   }
 
