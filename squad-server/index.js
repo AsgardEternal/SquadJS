@@ -587,13 +587,13 @@ export default class SquadServer extends EventEmitter {
       if (!Layers.layers.find((e) => e?.layerid === layer)) {
         const newLayer = this.mapLayer(layer);
         if (!newLayer) continue;
-        Logger.verbose('LayerUpdater', 1, 'Created RCON Layer: ', newLayer);
+        // Logger.verbose('LayerUpdater', 1, 'Created RCON Layer: ', newLayer);
         Layers._layers.set(newLayer.layerid, newLayer);
       }
     }
 
     for (const layer of Layers.layers) {
-      Logger.verbose('LayerUpdater', 1, 'Found layer: ', layer.layerid, ' - ', layer.name);
+      Logger.verbose('LayerUpdater', 1, 'Found layer: ' + layer.layerid + ' - ' + layer.name);
     }
   }
 
