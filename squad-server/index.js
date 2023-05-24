@@ -330,7 +330,7 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('SERVER-MOVE-WARN', async (data) => {
       const tsd = data.tse - data.cts;
-      if (tsd < 235 && tsd > 0) return;
+      if ((tsd < 235) && (tsd > 0)) return;
 
       const outdata = {
         raw: data.raw,
