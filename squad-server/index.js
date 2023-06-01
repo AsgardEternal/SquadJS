@@ -282,7 +282,7 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.logParser.on('PLAYER_DIED', async (data) => {
-      console.log(data);
+      //console.log(data);
       data.victim = await this.getPlayerByName(data.victimName);
       data.attacker = await this.getPlayerByName(data.attackerName);
       if (!data.attacker)
@@ -293,7 +293,7 @@ export default class SquadServer extends EventEmitter {
           data.victim.teamID === data.attacker.teamID &&
           data.victim.steamID !== data.attacker.steamID;
 
-      console.log(data);
+      //console.log(data);
 
       this.emit('PLAYER_DIED', data);
     });
@@ -537,7 +537,7 @@ export default class SquadServer extends EventEmitter {
         port: this.options.queryPort
       });
       
-      consol.log(data);
+      console.log(data);
 
       const info = {
         raw: data.raw,
