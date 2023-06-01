@@ -536,6 +536,8 @@ export default class SquadServer extends EventEmitter {
         host: this.options.host,
         port: this.options.queryPort
       });
+      
+      consol.log(data);
 
       const info = {
         raw: data.raw,
