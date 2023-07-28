@@ -342,7 +342,7 @@ export default class SquadServer extends EventEmitter {
         probcolor: data.cts < 2 ? 0xffff00 : null
       };
 
-      if((tsd < 235) && (tsd > 0)) this.emit('PLAYER-CHEAT', outdata);
+      if(((tsd < 235) && (tsd > 0)) || tsd < 100) this.emit('PLAYER-CHEAT', outdata);
     });
 
     this.logParser.on('EXPLODE-ATTACK', async (data) => {
