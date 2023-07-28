@@ -79,5 +79,8 @@ export default class DiscordCheater extends DiscordBasePlugin {
         timestamp: info.time ? info.time.toISOString() : 'Unkown'
       }
     });
+    if(info.probcheat==='high'){
+      this.server.rcon.kick(info.player.steamID, 'R14 | Cheating - highly suspected');
+    }
   }
 }
