@@ -618,7 +618,7 @@ export default class SquadServer extends EventEmitter {
 
   // helper for updateLayerList
   mapLayer(layid) {
-    layid = layid.replace(/[^a-z_\d]/gi, '');
+    layid = layid.replace(/[^a-z_-\d]/gi, '');
     const gl =
       /^((?<mod>[A-Z]+)_)?(?<level>[A-Za-z]+)_((?<gamemode>[A-Za-z]+)(_|$))?((?<version>[vV][0-9]+)(_|$))?((?<team1>[a-zA-Z0-9]+)[-v](?<team2>[a-zA-Z0-9]+))?/gm.exec(
         layid
