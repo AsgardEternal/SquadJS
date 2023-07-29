@@ -649,9 +649,9 @@ export default class SquadServer extends EventEmitter {
       map: {
         name: gl.level
       },
-      gamemode: gl.gamemode,
-      gamemodeType: gl.gamemode,
-      version: gl.version,
+      gamemode: gl.gamemode ? gl.gamemode : 'Training',
+      gamemodeType: gl.gamemode ? gl.gamemode : 'Training',
+      version: gl.version ? gl.version : 'v0',
       size: '0.0x0.0 km',
       sizeType: 'Playable Area',
       numberOfCapturePoints: 0,
