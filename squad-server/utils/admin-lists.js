@@ -44,7 +44,7 @@ export default async function fetchAdminLists(adminLists) {
     }
 
     const groupRgx = /(?<=^Group=)(?<groupID>.*?):(?<groupPerms>.*?)(?=(?:\r\n|\r|\n|\s+\/\/))/gm;
-    const adminRgx = /(?<=^Admin=)(?<steamID>\d+):(?<groupID>\S+)/gm;
+    const adminRgx = /(?<=^Admin=)(?<steamID>\d+):(?<groupID>.+)/gm;
 
     for (const m of data.matchAll(groupRgx)) {
       groups[`${idx}-${m.groups.groupID}`] = m.groups.groupPerms.split(',');
