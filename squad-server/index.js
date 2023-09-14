@@ -473,13 +473,17 @@ export default class SquadServer extends EventEmitter {
       const nextMap = await this.rcon.getNextMap();
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
 
-      let currentLayer = this.currentLayer;
+      let currentLayer;
+      let serverLayer = this.currentLayer;
+      let a2slayerid = this.currentLayerA2S;
+      let a2slayer;
+      if (!a2slayerid) a2slayer = await Layers.getLayerById(a2slayerid)
       if (!currentLayer) currentLayer = await Layers.getLayerByName(currentMap.layer);
       if (!currentLayer) currentLayer = await Layers.getLayerById(currentMap.layer);
       if (!currentLayer) currentLayer = await Layers.getLayerByClassname(currentMap.layer);
       if (!currentLayer) {
-        if (currentMap.layer === "Jensen's Range")
-          currentLayer = await Layers.getLayerById('Jensens_Range_ADF-PLA');
+        if (currentMap.layer === "Jensen's Training Range")
+          currentLayer = await Layers.getLayerById('JensensRange_ADF-PLA');
       }
       if (!currentLayer) {
         const cleanrconmap = currentMap.layer.toLowerCase().replace(/[ _]/gi, '');
@@ -509,7 +513,10 @@ export default class SquadServer extends EventEmitter {
 
       this.currentLayerRcon = currentMap;
       Logger.verbose('SquadServer', 1, 'Layer information found to be: ', currentMap.layer);
-      this.currentLayer = currentLayer;
+      if (!serverLayer){
+        if (!a2slayer) this.currentLayer = currentLayer;
+        else this.currentLayer = a2slayer;
+      }
       this.nextLayer = nextLayer;
       this.nextLayerToBeVoted = nextMapToBeVoted;
 
@@ -553,7 +560,8 @@ export default class SquadServer extends EventEmitter {
         reserveQueue: parseInt(data.raw.rules.ReservedQueue_i),
 
         matchTimeout: parseFloat(data.raw.rules.MatchTimeout_f),
-        gameVersion: data.raw.version
+        gameVersion: data.raw.version,
+        currentLayer: data.map
       };
 
       this.serverName = info.serverName;
@@ -568,6 +576,8 @@ export default class SquadServer extends EventEmitter {
 
       this.matchTimeout = info.matchTimeout;
       this.gameVersion = info.gameVersion;
+
+      this.currentLayerA2S = info.currentLayer;
 
       this.emit('UPDATED_A2S_INFORMATION', info);
     } catch (err) {
