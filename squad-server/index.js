@@ -282,7 +282,7 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.logParser.on('PLAYER_DIED', async (data) => {
-      //console.log(data);
+      // console.log(data);
       data.victim = await this.getPlayerByName(data.victimName);
       data.attacker = await this.getPlayerByName(data.attackerName);
       if (!data.attacker)
@@ -293,7 +293,7 @@ export default class SquadServer extends EventEmitter {
           data.victim.teamID === data.attacker.teamID &&
           data.victim.steamID !== data.attacker.steamID;
 
-      //console.log(data);
+      // console.log(data);
 
       this.emit('PLAYER_DIED', data);
     });
@@ -330,7 +330,7 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('SERVER-MOVE-WARN', async (data) => {
       const tsd = data.tse - data.cts;
-      Logger.verbose('ServerMoveWarn', 1, "tsd value: " + tsd);
+      Logger.verbose('ServerMoveWarn', 1, 'tsd value: ' + tsd);
 
       const outdata = {
         raw: data.raw,
@@ -342,7 +342,7 @@ export default class SquadServer extends EventEmitter {
         probcolor: data.cts < 2 ? 0xffff00 : null
       };
 
-      if(((tsd < 235) && (tsd > 0)) || (tsd < -100)) this.emit('PLAYER-CHEAT', outdata);
+      if ((tsd < 235 && tsd > 0) || tsd < -100) this.emit('PLAYER-CHEAT', outdata);
     });
 
     this.logParser.on('EXPLODE-ATTACK', async (data) => {
@@ -474,10 +474,10 @@ export default class SquadServer extends EventEmitter {
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
 
       let currentLayer;
-      let serverLayer = this.currentLayer;
-      let a2slayerid = this.currentLayerA2S;
+      const serverLayer = this.currentLayer;
+      const a2slayerid = this.currentLayerA2S;
       let a2slayer;
-      if (!a2slayerid) a2slayer = await Layers.getLayerById(a2slayerid)
+      if (!a2slayerid) a2slayer = await Layers.getLayerById(a2slayerid);
       if (!currentLayer) currentLayer = await Layers.getLayerByName(currentMap.layer);
       if (!currentLayer) currentLayer = await Layers.getLayerById(currentMap.layer);
       if (!currentLayer) currentLayer = await Layers.getLayerByClassname(currentMap.layer);
@@ -513,7 +513,7 @@ export default class SquadServer extends EventEmitter {
 
       this.currentLayerRcon = currentMap;
       Logger.verbose('SquadServer', 1, 'Layer information found to be: ', currentMap.layer);
-      if (!serverLayer){
+      if (!serverLayer) {
         if (!a2slayer) this.currentLayer = currentLayer;
         else this.currentLayer = a2slayer;
       }
@@ -544,7 +544,7 @@ export default class SquadServer extends EventEmitter {
         host: this.options.host,
         port: this.options.queryPort
       });
-      
+
       console.log(data);
 
       const info = {
