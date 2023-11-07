@@ -80,7 +80,9 @@ export default class DiscordCheater extends DiscordBasePlugin {
       }
     });
     if (info.probcheat ? info.probcheat === 'high' : true) {
-      await this.server.rcon.kick(info.player.steamID, 'R14 | Cheating - highly suspected');
+      if (info.player){
+        await this.server.rcon.kick(info.player.steamID, 'R14 | Cheating - highly suspected');
+      }
     }
   }
 }
