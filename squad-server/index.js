@@ -474,6 +474,7 @@ export default class SquadServer extends EventEmitter {
       const nextMap = await this.rcon.getNextMap();
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
 
+      Logger.verbose('RCON', 1, "curlay name:" + currentLayer?.name + ", rcon name:" + currentMap.layer);
       if (currentLayer?.name !== currentMap.layer){
         let rconlayer = await Layers.getLayerByName(currentMap.layer);
         if (!rconlayer) rconlayer = await Layers.getLayerById(currentMap.layer);
@@ -544,7 +545,7 @@ export default class SquadServer extends EventEmitter {
         port: this.options.queryPort
       });
 
-      console.log(data);
+      // console.log(data);
 
       const info = {
         raw: data.raw,
@@ -576,6 +577,7 @@ export default class SquadServer extends EventEmitter {
       this.matchTimeout = info.matchTimeout;
       this.gameVersion = info.gameVersion;
 
+      Logger.verbose('SquadServer', 1, 'a2smsg' + info.currentLayer + ", current id:" + serverlayer?.layerid);
       if (info.currentLayer !== serverlayer?.layerid) {
         const a2slayer = await Layers.getLayerById(info.currentLayer);
         this.currentLayer = a2slayer ? a2slayer : this.currentLayer;
@@ -631,7 +633,7 @@ export default class SquadServer extends EventEmitter {
 
   // helper for updateLayerList
   mapLayer(layid) {
-    layid = layid.replace(/[^a-z_-\d]/gi, '');
+    layid = layid.replace(/[^\da-z_-]/gi, '');
     const gl =
       /^((?<mod>[A-Z]+)_)?(?<level>[A-Za-z]+)_((?<gamemode>[A-Za-z]+)(_|$))?((?<version>[vV][0-9]+)(_|$))?((?<team1>[a-zA-Z0-9]+)[-v](?<team2>[a-zA-Z0-9]+))?/gm.exec(
         layid
