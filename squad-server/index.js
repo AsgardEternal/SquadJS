@@ -501,7 +501,7 @@ export default class SquadServer extends EventEmitter {
                     cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, ''))
             );
 
-        if (rconlayer){
+        if (rconlayer && currentMap.layer !== "Jensen's Training Range"){
           currentLayer = rconlayer;
         }
       }
