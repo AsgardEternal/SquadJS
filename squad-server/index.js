@@ -469,41 +469,44 @@ export default class SquadServer extends EventEmitter {
     Logger.verbose('SquadServer', 1, `Updating layer information...`);
 
     try {
+      let currentLayer = this.currentLayer;
       const currentMap = await this.rcon.getCurrentMap();
       const nextMap = await this.rcon.getNextMap();
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
 
-      let currentLayer;
-      const serverLayer = this.currentLayer;
-      const a2slayerid = this.currentLayerA2S;
-      let a2slayer;
-      if (!a2slayerid) a2slayer = await Layers.getLayerById(a2slayerid);
-      if (!currentLayer) currentLayer = await Layers.getLayerByName(currentMap.layer);
-      if (!currentLayer) currentLayer = await Layers.getLayerById(currentMap.layer);
-      if (!currentLayer) currentLayer = await Layers.getLayerByClassname(currentMap.layer);
-      if (!currentLayer) {
-        if (currentMap.layer === "Jensen's Training Range")
-          currentLayer = await Layers.getLayerById('JensensRange_ADF-PLA');
+      if (currentLayer?.name !== currentMap.layer){
+        let rconlayer = await Layers.getLayerByName(currentMap.layer);
+        if (!rconlayer) rconlayer = await Layers.getLayerById(currentMap.layer);
+        if (!rconlayer) rconlayer = await Layers.getLayerByClassname(currentMap.layer);
+        if (!rconlayer) {
+            if (currentMap.layer === "Jensen's Training Range")
+                rconlayer = await Layers.getLayerById('JensensRange_ADF-PLA')
+        }
+        if (!rconlayer) {
+            const cleanrconmap = currentMap.layer.toLowerCase().replace(/[ _]/gi, '');
+            rconlayer = await Layers.getLayerByCondition(
+                (l) =>
+                    cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.modName.toLowerCase().replace(/[ _]/gi, ''))
+            );
+        }
+        if (!rconlayer)
+            currentLayer = await Layers.getLayerByCondition(
+                (l) =>
+                    cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, ''))
+            );
+
+        if (rconlayer){
+          currentLayer = rconlayer;
+        }
       }
-      if (!currentLayer) {
-        const cleanrconmap = currentMap.layer.toLowerCase().replace(/[ _]/gi, '');
-        currentLayer = await Layers.getLayerByCondition(
-          (l) =>
-            cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
-            cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
-            cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, '')) &&
-            cleanrconmap.includes(l.modName.toLowerCase().replace(/[ _]/gi, ''))
-        );
-        if (!currentLayer)
-          currentLayer = await Layers.getLayerByCondition(
-            (l) =>
-              cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
-              cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
-              cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, ''))
-          );
-      }
-      if (currentLayer) Logger.verbose('SquadServer', 1, 'Found Current layer');
-      else Logger.verbose('SquadServer', 1, 'WARNING: Could not find layer from RCON');
+        if (currentLayer) Logger.verbose('SquadServer', 1, 'Found Current layer');
+        else Logger.verbose('SquadServer', 1, 'WARNING: Could not find layer from RCON');
+
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
 
       if (this.layerHistory.length === 0) {
@@ -511,12 +514,7 @@ export default class SquadServer extends EventEmitter {
         this.layerHistory = this.layerHistory.slice(0, this.layerHistoryMaxLength);
       }
 
-      this.currentLayerRcon = currentMap;
-      Logger.verbose('SquadServer', 1, 'Layer information found to be: ', currentMap.layer);
-      if (!serverLayer) {
-        if (!a2slayer) this.currentLayer = currentLayer;
-        else this.currentLayer = a2slayer;
-      }
+      this.currentLayer = currentLayer;
       this.nextLayer = nextLayer;
       this.nextLayerToBeVoted = nextMapToBeVoted;
 
@@ -539,6 +537,7 @@ export default class SquadServer extends EventEmitter {
     Logger.verbose('SquadServer', 1, `Updating A2S information...`);
 
     try {
+      const serverlayer = this.currentLayer;
       const data = await Gamedig.query({
         type: 'squad',
         host: this.options.host,
@@ -577,7 +576,10 @@ export default class SquadServer extends EventEmitter {
       this.matchTimeout = info.matchTimeout;
       this.gameVersion = info.gameVersion;
 
-      this.currentLayerA2S = info.currentLayer;
+      if (info.currentLayer !== serverlayer?.layerid) {
+        const a2slayer = await Layers.getLayerById(info.currentLayer);
+        this.currentLayer = a2slayer ? a2slayer : this.currentLayer;
+      }
 
       this.emit('UPDATED_A2S_INFORMATION', info);
     } catch (err) {
