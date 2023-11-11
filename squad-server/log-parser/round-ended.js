@@ -14,8 +14,8 @@ export default {
       loser: logParser.eventStore.ROUND_LOSER ? logParser.eventStore.ROUND_LOSER : null,
       time: args[1]
     };
-    logParser.emit('ROUND_ENDED', data);
     delete logParser.eventStore.ROUND_WINNER;
     delete logParser.eventStore.ROUND_LOSER;
+    logParser.emit('ROUND_ENDED', data);
   }
 };

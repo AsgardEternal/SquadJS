@@ -140,10 +140,10 @@ export default class SquadRcon extends Rcon {
     const players = [];
 
     if(!response || response.length < 1) return players;
-    
+
     for (const line of response.split('\n')) {
       const match = line.match(
-        /ID: ([0-9]+) \| SteamID: ([0-9]{17}) \| Name: (.+) \| Team ID: ([0-9]+) \| Squad ID: ([0-9]+|N\/A) \| Is Leader: (True|False) \| Role: ([A-Za-z0-9_]*)\b/
+        /ID: ([0-9]+) \| SteamID: ([0-9]{17}) \| Name: (.+) \| Team ID: ([0-9]+) \| Squad ID: ([0-9]+|N\/A) \| Is Leader: (True|False) \| Role: (.+)/
       );
       if (!match) continue;
 
@@ -153,8 +153,8 @@ export default class SquadRcon extends Rcon {
         name: match[3],
         teamID: match[4],
         squadID: match[5] !== 'N/A' ? match[5] : null,
-        isLeader: match[6] === 'True',
-        role: match[7]
+        isSquadLeader: match[6] === 'True',
+        rconRole: match[7]
       });
     }
 

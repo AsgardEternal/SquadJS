@@ -138,6 +138,9 @@ export default class DBLog extends BasePlugin {
         },
         lastName: {
           type: DataTypes.STRING
+        },
+        discordID: {
+          type: DataTypes.BIGINT
         }
       },
       {
@@ -392,6 +395,8 @@ export default class DBLog extends BasePlugin {
     this.onTickRate = this.onTickRate.bind(this);
     this.onUpdatedA2SInformation = this.onUpdatedA2SInformation.bind(this);
     this.onNewGame = this.onNewGame.bind(this);
+    this.onRoundEnd = this.onRoundEnd.bind(this);
+    this.onPlayerNameChange = this.onPlayerNameChange.bind(this);
     this.onPlayerWounded = this.onPlayerWounded.bind(this);
     this.onPlayerDied = this.onPlayerDied.bind(this);
     this.onPlayerRevived = this.onPlayerRevived.bind(this);
@@ -420,22 +425,30 @@ export default class DBLog extends BasePlugin {
       name: this.server.serverName
     });
 
-    this.match = await this.models.Match.findOne({
-      where: { server: this.options.overrideServerID || this.server.id, endTime: null }
-    });
+    await this.repairDB();
 
     this.server.on('TICK_RATE', this.onTickRate);
     this.server.on('UPDATED_A2S_INFORMATION', this.onUpdatedA2SInformation);
     this.server.on('NEW_GAME', this.onNewGame);
+    this.server.on('ROUND_ENDED', this.onRoundEnd);
+    this.server.on('PLAYER_NAME_CHANGE', this.onPlayerNameChange);
     this.server.on('PLAYER_WOUNDED', this.onPlayerWounded);
     this.server.on('PLAYER_DIED', this.onPlayerDied);
     this.server.on('PLAYER_REVIVED', this.onPlayerRevived);
+  }
+
+  async repairDB() {
+    this.match = await this.models.Match.findOne({
+      where: { server: this.options.overrideServerID || this.server.id, endTime: null }
+    });
   }
 
   async unmount() {
     this.server.removeEventListener('TICK_RATE', this.onTickRate);
     this.server.removeEventListener('UPDATED_A2S_INFORMATION', this.onTickRate);
     this.server.removeEventListener('NEW_GAME', this.onNewGame);
+    this.server.removeEventListener('ROUND_ENDED', this.onRoundEnd);
+    this.server.removeEventListener('PLAYER_NAME_CHANGE', this.onPlayerNameChange);
     this.server.removeEventListener('PLAYER_WOUNDED', this.onPlayerWounded);
     this.server.removeEventListener('PLAYER_DIED', this.onPlayerDied);
     this.server.removeEventListener('PLAYER_REVIVED', this.onPlayerRevived);
@@ -461,6 +474,7 @@ export default class DBLog extends BasePlugin {
   }
 
   async onNewGame(info) {
+    this.verbose(1, 'New Game');
     await this.models.Match.update(
       { endTime: info.time, winner: info.winner },
       { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }
@@ -475,6 +489,22 @@ export default class DBLog extends BasePlugin {
       layer: info.layer ? info.layer.name : null,
       startTime: info.time
     });
+  }
+
+  async onRoundEnd(info) {
+    this.verbose(1, 'Round End');
+    await this.models.Match.update(
+      { endTime: info.time, winner: info.winnerFaction },
+      { where: { server: this.options.overrideServerID || this.server.id, endTime: null } }
+    );
+  }
+
+  async onPlayerNameChange(info) {
+    if (info.player)
+      await this.models.SteamUser.upsert({
+        steamID: info.player.steamID,
+        lastName: info.player.name
+      });
   }
 
   async onPlayerWounded(info) {

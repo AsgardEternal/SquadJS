@@ -427,6 +427,43 @@ Interested in creating your own plugin? [See more here](./squad-server/plugins/r
         </details>
 
 <details>
+          <summary>DBLogPlayerTime</summary>
+          <h2>DBLogPlayerTime</h2>
+          <p>replacement add-on to dblog for player join/seeding times</p>
+          <h3>Options</h3>
+          <ul><li><h4>database (Required)</h4>
+           <h6>Description</h6>
+           <p>The Sequelize connector to log server information to.</p>
+           <h6>Default</h6>
+           <pre><code>mysql</code></pre></li>
+<li><h4>overrideServerID</h4>
+           <h6>Description</h6>
+           <p>A overridden server ID.</p>
+           <h6>Default</h6>
+           <pre><code>null</code></pre></li>
+<li><h4>seedingThreshold</h4>
+           <h6>Description</h6>
+           <p>seeding Threshold.</p>
+           <h6>Default</h6>
+           <pre><code>50</code></pre></li>
+<li><h4>whitelistfilepath</h4>
+           <h6>Description</h6>
+           <p>path to a file to write out auto-wl</p>
+           <h6>Default</h6>
+           <pre><code>null</code></pre></li>
+<li><h4>incseed</h4>
+           <h6>Description</h6>
+           <p>rate of increase as a percentage to whitelist</p>
+           <h6>Default</h6>
+           <pre><code>0</code></pre></li>
+<li><h4>decseed</h4>
+           <h6>Description</h6>
+           <p>rate of decrease as a percentage to whitelist</p>
+           <h6>Default</h6>
+           <pre><code>0</code></pre></li></ul>
+        </details>
+
+<details>
           <summary>DBLog</summary>
           <h2>DBLog</h2>
           <p>The <code>mysql-log</code> plugin will log various server statistics and events to a database. This is great for server performance monitoring and/or player stat tracking.
@@ -599,6 +636,29 @@ Grafana:
            <pre><code>[
   "ChatSquad"
 ]</code></pre></li></ul>
+        </details>
+
+<details>
+          <summary>DiscordCheater</summary>
+          <h2>DiscordCheater</h2>
+          <p>The <code>DiscordCheater</code> plugin will send any suspected cheating to a Discord channel.</p>
+          <h3>Options</h3>
+          <ul><li><h4>discordClient (Required)</h4>
+           <h6>Description</h6>
+           <p>Discord connector name.</p>
+           <h6>Default</h6>
+           <pre><code>discord</code></pre></li>
+<li><h4>channelID (Required)</h4>
+           <h6>Description</h6>
+           <p>The ID of the channel to log admin broadcasts to.</p>
+           <h6>Default</h6>
+           <pre><code></code></pre></li><h6>Example</h6>
+           <pre><code>667741905228136459</code></pre>
+<li><h4>color</h4>
+           <h6>Description</h6>
+           <p>The color of the embed.</p>
+           <h6>Default</h6>
+           <pre><code>16711680</code></pre></li></ul>
         </details>
 
 <details>

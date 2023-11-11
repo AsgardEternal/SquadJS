@@ -73,6 +73,7 @@ export default class SquadServer extends EventEmitter {
     this.admins = await fetchAdminLists(this.options.adminLists);
 
     await this.rcon.connect();
+    await this.updateLayerList();
     await this.logParser.watch();
 
     await this.updateSquadList();
@@ -206,20 +207,46 @@ export default class SquadServer extends EventEmitter {
       this.emit('NEW_GAME', data);
     });
 
+    this.logParser.on('ROUND_ENDED', async (data) => {
+      const datalayer = data.winner ? await Layers.getLayerById(data.winner.layer) : null;
+      const outdata = {
+        rawData: data,
+        rawLayer: data.winner ? data.winner.layer : null,
+        rawLevel: data.winner ? data.winner.level : null,
+        time: data.time,
+        winnerId: data.winner ? data.winner.team : null,
+        winnerFaction: data.winner ? data.winner.faction : null,
+        winnerTickets: data.winner ? data.winner.tickets : null,
+        loserId: data.loser ? data.loser.team : null,
+        loserFaction: data.loser ? data.loser.faction : null,
+        loserTickets: data.loser ? data.loser.tickets : null,
+        layer: datalayer
+      };
+
+      this.emit('ROUND_ENDED', outdata);
+    });
+
     this.logParser.on('PLAYER_CONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
-      if (data.player) data.player.suffix = data.playerSuffix;
-
-      delete data.steamID;
-      delete data.playerSuffix;
+      if (data.player) {
+        data.player.suffix = data.playerSuffix;
+      } else {
+        data.player = {
+          steamID: data.steamID,
+          name: data.playerSuffix
+        };
+      }
 
       this.emit('PLAYER_CONNECTED', data);
     });
 
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
-
-      delete data.steamID;
+      if (!data.player) {
+        data.player = {
+          steamID: data.steamID
+        };
+      }
 
       this.emit('PLAYER_DISCONNECTED', data);
     });
@@ -250,14 +277,12 @@ export default class SquadServer extends EventEmitter {
           data.victim.teamID === data.attacker.teamID &&
           data.victim.steamID !== data.attacker.steamID;
 
-      delete data.victimName;
-      delete data.attackerName;
-
       this.emit('PLAYER_WOUNDED', data);
       if (data.teamkill) this.emit('TEAMKILL', data);
     });
 
     this.logParser.on('PLAYER_DIED', async (data) => {
+      // console.log(data);
       data.victim = await this.getPlayerByName(data.victimName);
       data.attacker = await this.getPlayerByName(data.attackerName);
       if (!data.attacker)
@@ -268,8 +293,7 @@ export default class SquadServer extends EventEmitter {
           data.victim.teamID === data.attacker.teamID &&
           data.victim.steamID !== data.attacker.steamID;
 
-      delete data.victimName;
-      delete data.attackerName;
+      // console.log(data);
 
       this.emit('PLAYER_DIED', data);
     });
@@ -289,6 +313,7 @@ export default class SquadServer extends EventEmitter {
     this.logParser.on('PLAYER_POSSESS', async (data) => {
       data.player = await this.getPlayerByNameSuffix(data.playerSuffix);
       if (data.player) data.player.possessClassname = data.possessClassname;
+      if (data.player) data.player.characterClassname = data.characterClassname;
 
       delete data.playerSuffix;
 
@@ -303,8 +328,33 @@ export default class SquadServer extends EventEmitter {
       this.emit('PLAYER_UNPOSSESS', data);
     });
 
-    this.logParser.on('ROUND_ENDED', async (data) => {
-      this.emit('ROUND_ENDED', data);
+    this.logParser.on('SERVER-MOVE-WARN', async (data) => {
+      const tsd = data.tse - data.cts;
+      Logger.verbose('ServerMoveWarn', 1, 'tsd value: ' + tsd);
+
+      const outdata = {
+        raw: data.raw,
+        time: data.time,
+        rawID: data.characterName,
+        cheatType: 'Remote Actions',
+        player: await this.getPlayerByCondition((p) => p.characterClassname === data.characterName),
+        probcheat: data.cts < 2 ? 'unlikely' : null,
+        probcolor: data.cts < 2 ? 0xffff00 : null
+      };
+
+      if ((tsd < 235 && tsd > 0) || tsd < -100) this.emit('PLAYER-CHEAT', outdata);
+    });
+
+    this.logParser.on('EXPLODE-ATTACK', async (data) => {
+      const outdata = {
+        raw: data.raw,
+        time: data.time,
+        rawID: data.playercont,
+        cheatType: 'Explosion attack',
+        player: await this.getPlayerByController(data.playercont)
+      };
+
+      this.emit('PLAYER-CHEAT', outdata);
     });
 
     this.logParser.on('TICK_RATE', (data) => {
@@ -352,20 +402,27 @@ export default class SquadServer extends EventEmitter {
       }
 
       const players = [];
-      for (const player of await this.rcon.getListPlayers())
+      for (const player of await this.rcon.getListPlayers()) {
         players.push({
           ...oldPlayerInfo[player.steamID],
           ...player,
-          playercontroller: this.logParser.eventStore.players[player.steamID]
+          playercont: this.logParser.eventStore.players[player.steamID]
             ? this.logParser.eventStore.players[player.steamID].controller
             : null,
           squad: await this.getSquadByID(player.teamID, player.squadID)
         });
+      }
 
       this.players = players;
 
       for (const player of this.players) {
         if (typeof oldPlayerInfo[player.steamID] === 'undefined') continue;
+        if (player.name !== oldPlayerInfo[player.steamID].name)
+          this.emit('PLAYER_NAME_CHANGE', {
+            player: player,
+            oldName: oldPlayerInfo[player.steamID].name,
+            newName: player.name
+          });
         if (player.teamID !== oldPlayerInfo[player.steamID].teamID)
           this.emit('PLAYER_TEAM_CHANGE', {
             player: player,
@@ -412,11 +469,45 @@ export default class SquadServer extends EventEmitter {
     Logger.verbose('SquadServer', 1, `Updating layer information...`);
 
     try {
+      let currentLayer = this.currentLayer;
       const currentMap = await this.rcon.getCurrentMap();
       const nextMap = await this.rcon.getNextMap();
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
 
-      const currentLayer = await Layers.getLayerByName(currentMap.layer);
+      Logger.verbose('RCON', 1, "curlay name:" + currentLayer?.name + ", rcon name:" + currentMap.layer);
+      if (currentLayer?.name !== currentMap.layer){
+        let rconlayer = await Layers.getLayerByName(currentMap.layer);
+        if (!rconlayer) rconlayer = await Layers.getLayerById(currentMap.layer);
+        if (!rconlayer) rconlayer = await Layers.getLayerByClassname(currentMap.layer);
+        if (!rconlayer) {
+            if (currentMap.layer === "Jensen's Training Range")
+                rconlayer = await Layers.getLayerById('JensensRange_ADF-PLA')
+        }
+        if (!rconlayer) {
+            const cleanrconmap = currentMap.layer.toLowerCase().replace(/[ _]/gi, '');
+            rconlayer = await Layers.getLayerByCondition(
+                (l) =>
+                    cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.modName.toLowerCase().replace(/[ _]/gi, ''))
+            );
+        }
+        if (!rconlayer)
+            currentLayer = await Layers.getLayerByCondition(
+                (l) =>
+                    cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
+                    cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, ''))
+            );
+
+        if (rconlayer && currentMap.layer !== "Jensen's Training Range"){
+          currentLayer = rconlayer;
+        }
+      }
+        if (currentLayer) Logger.verbose('SquadServer', 1, 'Found Current layer');
+        else Logger.verbose('SquadServer', 1, 'WARNING: Could not find layer from RCON');
+
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
 
       if (this.layerHistory.length === 0) {
@@ -447,11 +538,14 @@ export default class SquadServer extends EventEmitter {
     Logger.verbose('SquadServer', 1, `Updating A2S information...`);
 
     try {
+      const serverlayer = this.currentLayer;
       const data = await Gamedig.query({
         type: 'squad',
         host: this.options.host,
         port: this.options.queryPort
       });
+
+      // console.log(data);
 
       const info = {
         raw: data.raw,
@@ -466,7 +560,8 @@ export default class SquadServer extends EventEmitter {
         reserveQueue: parseInt(data.raw.rules.ReservedQueue_i),
 
         matchTimeout: parseFloat(data.raw.rules.MatchTimeout_f),
-        gameVersion: data.raw.version
+        gameVersion: data.raw.version,
+        currentLayer: data.map
       };
 
       this.serverName = info.serverName;
@@ -482,6 +577,12 @@ export default class SquadServer extends EventEmitter {
       this.matchTimeout = info.matchTimeout;
       this.gameVersion = info.gameVersion;
 
+      Logger.verbose('SquadServer', 1, 'a2smsg' + info.currentLayer + ", current id:" + serverlayer?.layerid);
+      if (info.currentLayer !== serverlayer?.layerid) {
+        const a2slayer = await Layers.getLayerById(info.currentLayer);
+        this.currentLayer = a2slayer ? a2slayer : this.currentLayer;
+      }
+
       this.emit('UPDATED_A2S_INFORMATION', info);
     } catch (err) {
       Logger.verbose('SquadServer', 1, 'Failed to update A2S information.', err);
@@ -493,6 +594,88 @@ export default class SquadServer extends EventEmitter {
       this.updateA2SInformation,
       this.updateA2SInformationInterval
     );
+  }
+
+  async updateLayerList() {
+    // update expected list from http source
+    await Layers.pull();
+
+    // grab layers actually available through rcon
+    const rconRaw = (await this.rcon.execute('ListLayers'))?.split('\n') || [];
+    // take out first result, not actual layer just a header
+    rconRaw.shift();
+
+    // filter out raw result from RCON, modded layers have a suffix that needs filtering
+    const rconLayers = [];
+    for (const raw of rconRaw) {
+      rconLayers.push(raw.split(' ')[0]);
+    }
+
+    // go through http layers and delete any that don't show up in rcon
+    for (const layer of Layers.layers) {
+      if (!rconLayers.find((e) => e === layer.layerid)) Layers._layers.delete(layer.layerid);
+    }
+
+    // add layers that are in RCON that we did not find in the http list
+    for (const layer of rconLayers) {
+      if (!Layers.layers.find((e) => e?.layerid === layer)) {
+        const newLayer = this.mapLayer(layer);
+        if (!newLayer) continue;
+        // Logger.verbose('LayerUpdater', 1, 'Created RCON Layer: ', newLayer);
+        Layers._layers.set(newLayer.layerid, newLayer);
+      }
+    }
+
+    for (const layer of Layers.layers) {
+      Logger.verbose('LayerUpdater', 1, 'Found layer: ' + layer.layerid + ' - ' + layer.name);
+    }
+  }
+
+  // helper for updateLayerList
+  mapLayer(layid) {
+    layid = layid.replace(/[^\da-z_-]/gi, '');
+    const gl =
+      /^((?<mod>[A-Z]+)_)?(?<level>[A-Za-z]+)_((?<gamemode>[A-Za-z]+)(_|$))?((?<version>[vV][0-9]+)(_|$))?((?<team1>[a-zA-Z0-9]+)[-v](?<team2>[a-zA-Z0-9]+))?/gm.exec(
+        layid
+      )?.groups;
+    if (!gl) return;
+
+    const teams = [];
+    // eslint-disable-next-line no-unused-vars
+    for (const t of ['team1', 'team2']) {
+      teams.push({
+        tickets: 0,
+        commander: false,
+        vehicles: [],
+        numberOfTanks: 0,
+        numberOfHelicopters: 0
+      });
+    }
+    teams[0].faction = gl.team1 ? gl.team1 : 'Unknown';
+    teams[0].name = gl.team1 ? gl.team1 : 'Unknown';
+    teams[1].faction = gl.team2 ? gl.team2 : 'Unknown';
+    teams[1].name = gl.team2 ? gl.team2 : 'Unknown';
+
+    return {
+      name: layid.replace(/_/g, ' '),
+      classname: gl.level,
+      layerid: layid,
+      modName: gl.mod ? gl.mod : 'Vanilla',
+      map: {
+        name: gl.level
+      },
+      gamemode: gl.gamemode ? gl.gamemode : 'Training',
+      gamemodeType: gl.gamemode ? gl.gamemode : 'Training',
+      version: gl.version ? gl.version : 'v0',
+      size: '0.0x0.0 km',
+      sizeType: 'Playable Area',
+      numberOfCapturePoints: 0,
+      lighting: {
+        name: 'Unknown',
+        classname: 'Unknown'
+      },
+      teams: teams
+    };
   }
 
   async getPlayerByCondition(condition, forceUpdate = false, retry = true) {
@@ -551,10 +734,7 @@ export default class SquadServer extends EventEmitter {
   }
 
   async getPlayerByController(controller, forceUpdate) {
-    return this.getPlayerByCondition(
-      (player) => player.playercontroller === controller,
-      forceUpdate
-    );
+    return this.getPlayerByCondition((player) => player.playercont === controller, forceUpdate);
   }
 
   async pingSquadJSAPI() {

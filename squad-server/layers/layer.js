@@ -3,6 +3,8 @@ export default class Layer {
     this.name = data.Name;
     this.classname = data.levelName;
     this.layerid = data.rawName;
+    const mod = /^(?<name>[A-Z0-9]+)_.*/g.exec(data.rawName)?.groups;
+    this.modName = mod ? mod.name : 'Vanilla';
     this.map = {
       name: data.mapName
     };

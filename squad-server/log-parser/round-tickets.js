@@ -21,6 +21,13 @@ export default {
     };
     if (data.action === 'won') {
       logParser.eventStore.ROUND_WINNER = data;
+      logParser.eventStore.WON = {
+        raw: data.raw,
+        time: data.time,
+        chainID: data.chainID,
+        winner: data.subfaction,
+        layer: data.level
+      };
     } else {
       logParser.eventStore.ROUND_LOSER = data;
     }

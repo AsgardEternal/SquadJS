@@ -19,6 +19,7 @@ import ServerTickRate from './server-tick-rate.js';
 import ClientConnected from './client-connected.js';
 import ClientLogin from './client-login.js';
 import PendingConnectionDestroyed from './pending-connection-destroyed.js';
+import BadPlayerMovement from './BadPlayerMovement.js';
 
 export default class SquadLogParser extends LogParser {
   constructor(options) {
@@ -45,7 +46,8 @@ export default class SquadLogParser extends LogParser {
       ServerTickRate,
       ClientConnected,
       ClientLogin,
-      PendingConnectionDestroyed
+      PendingConnectionDestroyed,
+      BadPlayerMovement
     ];
   }
 }
