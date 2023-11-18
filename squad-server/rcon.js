@@ -139,6 +139,8 @@ export default class SquadRcon extends Rcon {
 
     const players = [];
 
+    if(!response || response.length < 1) return players;
+
     for (const line of response.split('\n')) {
       const match = line.match(
         /ID: ([0-9]+) \| SteamID: ([0-9]{17}) \| Name: (.+) \| Team ID: ([0-9]+) \| Squad ID: ([0-9]+|N\/A) \| Is Leader: (True|False) \| Role: (.+)/
@@ -166,6 +168,8 @@ export default class SquadRcon extends Rcon {
     let teamName;
     let teamID;
 
+    if(!responseSquad || responseSquad.length < 1) return squads;
+
     for (const line of responseSquad.split('\n')) {
       const match = line.match(
         /ID: ([0-9]+) \| Name: (.+) \| Size: ([0-9]+) \| Locked: (True|False) \| Creator Name: (.+) \| Creator Steam ID: ([0-9]{17})/
@@ -176,7 +180,7 @@ export default class SquadRcon extends Rcon {
         teamName = matchSide[2];
       }
       if (!match) continue;
-      await squads.push({
+      squads.push({
         squadID: match[1],
         squadName: match[2],
         size: match[3],

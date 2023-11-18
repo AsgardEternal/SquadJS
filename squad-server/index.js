@@ -29,6 +29,7 @@ export default class SquadServer extends EventEmitter {
     this.layerHistoryMaxLength = options.layerHistoryMaxLength || 20;
 
     this.players = [];
+    this.oldplayers = [];
 
     this.squads = [];
 
@@ -242,6 +243,10 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
+      if (!data.player){
+        const foundoldplayers = this.oldplayers.filter((player) => player.steamID === data.steamID);
+        data.player = foundoldplayers[0] ? foundoldplayers[0] : null;
+      }
       if (!data.player) {
         data.player = {
           steamID: data.steamID
@@ -414,6 +419,7 @@ export default class SquadServer extends EventEmitter {
       }
 
       this.players = players;
+      this.oldplayers = oldPlayerInfo;
 
       for (const player of this.players) {
         if (typeof oldPlayerInfo[player.steamID] === 'undefined') continue;
