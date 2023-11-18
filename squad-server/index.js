@@ -485,29 +485,8 @@ export default class SquadServer extends EventEmitter {
         let rconlayer = await Layers.getLayerByName(currentMap.layer);
         if (!rconlayer) rconlayer = await Layers.getLayerById(currentMap.layer);
         if (!rconlayer) rconlayer = await Layers.getLayerByClassname(currentMap.layer);
-        if (!rconlayer) {
-            if (currentMap.layer === "Jensen's Training Range")
-                rconlayer = await Layers.getLayerById('JensensRange_ADF-PLA')
-        }
-        if (!rconlayer) {
-            const cleanrconmap = currentMap.layer.toLowerCase().replace(/[ _]/gi, '');
-            rconlayer = await Layers.getLayerByCondition(
-                (l) =>
-                    cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
-                    cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
-                    cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, '')) &&
-                    cleanrconmap.includes(l.modName.toLowerCase().replace(/[ _]/gi, ''))
-            );
-        }
-        if (!rconlayer)
-            currentLayer = await Layers.getLayerByCondition(
-                (l) =>
-                    cleanrconmap.includes(l.map.name.toLowerCase().replace(/[ _]/gi, '')) &&
-                    cleanrconmap.includes(l.gamemode.toLowerCase().replace(/[ _]/gi, '')) &&
-                    cleanrconmap.includes(l.version.toLowerCase().replace(/[ _]/gi, ''))
-            );
 
-        if (rconlayer && currentMap.layer !== "Jensen's Training Range"){
+        if (rconlayer && (currentMap.layer !== "Jensen's Training Range")){
           currentLayer = rconlayer;
         }
       }
