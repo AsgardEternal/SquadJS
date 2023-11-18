@@ -246,11 +246,13 @@ export default class SquadServer extends EventEmitter {
       if (!data.player){
         const foundoldplayers = this.oldplayers.filter((player) => player.steamID === data.steamID);
         data.player = foundoldplayers[0] ? foundoldplayers[0] : null;
+        Logger.verbose('PlayerBugFix', 1, `Player bug caught: found disconnect player info to be ${JSON.stringify(data.player)}`);
       }
       if (!data.player) {
         data.player = {
           steamID: data.steamID
         };
+        Logger.verbose('PlayerBugFix', 1, 'Player bug caught and messed up: reverting to surefire methods!');
       }
 
       this.emit('PLAYER_DISCONNECTED', data);
@@ -420,6 +422,8 @@ export default class SquadServer extends EventEmitter {
 
       this.players = players;
       this.oldplayers = oldPlayerInfo;
+
+      Logger.verbose('PlayerBugFix', 1, 'saving old player info');
 
       for (const player of this.players) {
         if (typeof oldPlayerInfo[player.steamID] === 'undefined') continue;
