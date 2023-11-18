@@ -488,6 +488,7 @@ export default class SquadServer extends EventEmitter {
 
         if (rconlayer && (currentMap.layer !== "Jensen's Training Range")){
           currentLayer = rconlayer;
+          Logger.verbose('SquadServer', 1, `RCON is setting Layer information to ${rconlayer.layerid}`);
         }
       }
         if (currentLayer) Logger.verbose('SquadServer', 1, 'Found Current layer');
@@ -566,6 +567,7 @@ export default class SquadServer extends EventEmitter {
       if (info.currentLayer !== serverlayer?.layerid) {
         const a2slayer = await Layers.getLayerById(info.currentLayer);
         this.currentLayer = a2slayer ? a2slayer : this.currentLayer;
+        Logger.verbose('SquadServer', 1, `A2S is setting Layer information to ${this.currentLayer.layerid}`);
       }
 
       this.emit('UPDATED_A2S_INFORMATION', info);
