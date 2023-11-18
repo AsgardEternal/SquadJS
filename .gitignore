@@ -14,3 +14,7 @@ yarn.lock
 .vs/
 /squad-server/plugins/db-log-addOn.js
 /squad-server/plugins/mapvote.js
+
+config.json
+config.*.json
+!config.example.json
