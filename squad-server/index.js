@@ -204,6 +204,7 @@ export default class SquadServer extends EventEmitter {
       this.layerHistory = this.layerHistory.slice(0, this.layerHistoryMaxLength);
 
       this.currentLayer = data.layer;
+      Logger.verbose('layerupdate', 1, `Log parser setting layer to ${this.currentLayer?.layerid}`)
       await this.updateAdmins();
       this.emit('NEW_GAME', data);
     });
@@ -484,7 +485,7 @@ export default class SquadServer extends EventEmitter {
       const nextMap = await this.rcon.getNextMap();
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
 
-      Logger.verbose('RCON', 1, "curlay name:" + currentLayer?.name + ", rcon name:" + currentMap.layer);
+      Logger.verbose('layerupdate', 1, "curlay name:" + currentLayer?.name + ", rcon name:" + currentMap.layer);
       if (currentLayer?.name !== currentMap.layer){
         let rconlayer = await Layers.getLayerByName(currentMap.layer);
         if (!rconlayer) rconlayer = await Layers.getLayerById(currentMap.layer);
@@ -492,11 +493,11 @@ export default class SquadServer extends EventEmitter {
 
         if (rconlayer && (currentMap.layer !== "Jensen's Training Range")){
           currentLayer = rconlayer;
-          Logger.verbose('SquadServer', 1, `RCON is setting Layer information to ${rconlayer.layerid}`);
+          Logger.verbose('layerupdate', 1, `RCON is setting Layer information to ${rconlayer.layerid}`);
         }
       }
-        if (currentLayer) Logger.verbose('SquadServer', 1, 'Found Current layer');
-        else Logger.verbose('SquadServer', 1, 'WARNING: Could not find layer from RCON');
+        if (currentLayer) Logger.verbose('layerupdate', 1, 'Found Current layer');
+        else Logger.verbose('layerupdate', 1, 'WARNING: Could not find layer from RCON');
 
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
 
@@ -567,11 +568,11 @@ export default class SquadServer extends EventEmitter {
       this.matchTimeout = info.matchTimeout;
       this.gameVersion = info.gameVersion;
 
-      Logger.verbose('SquadServer', 1, 'a2smsg' + info.currentLayer + ", current id:" + serverlayer?.layerid);
+      Logger.verbose('layerupdate', 1, 'a2smsg' + info.currentLayer + ", current id:" + serverlayer?.layerid);
       if (info.currentLayer !== serverlayer?.layerid) {
         const a2slayer = await Layers.getLayerById(info.currentLayer);
         this.currentLayer = a2slayer ? a2slayer : this.currentLayer;
-        Logger.verbose('SquadServer', 1, `A2S is setting Layer information to ${this.currentLayer?.layerid}`);
+        Logger.verbose('layerupdate', 1, `A2S is setting Layer information to ${this.currentLayer?.layerid}`);
       }
 
       this.emit('UPDATED_A2S_INFORMATION', info);
