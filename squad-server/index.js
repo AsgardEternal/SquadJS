@@ -204,7 +204,7 @@ export default class SquadServer extends EventEmitter {
       this.layerHistory = this.layerHistory.slice(0, this.layerHistoryMaxLength);
 
       this.currentLayer = data.layer;
-      Logger.verbose('layerupdate', 1, `Log parser setting layer to ${this.currentLayer?.layerid}`)
+      Logger.verbose('layerupdate', 1, `Log parser setting layer to ${this.currentLayer?.layerid}`);
       await this.updateAdmins();
       this.emit('NEW_GAME', data);
     });
@@ -244,16 +244,24 @@ export default class SquadServer extends EventEmitter {
 
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
-      if (!data.player){
-        const foundoldplayers = this.oldplayers?.filter((player) => player.steamID === data.steamID);
-        data.player = foundoldplayers && foundoldplayers[0] ? foundoldplayers[0] : null;
-        Logger.verbose('PlayerBugFix', 1, `Player bug caught: found disconnect player info to be ${JSON.stringify(data.player)}`);
+      if (!data.player) {
+        const foundoldplayer = this.oldplayers?.get(data.steamID);
+        data.player = foundoldplayer || null;
+        Logger.verbose(
+          'PlayerBugFix',
+          1,
+          `Player bug caught: found disconnect player info to be ${JSON.stringify(data.player)}`
+        );
       }
       if (!data.player) {
         data.player = {
           steamID: data.steamID
         };
-        Logger.verbose('PlayerBugFix', 1, 'Player bug caught and messed up: reverting to surefire methods!');
+        Logger.verbose(
+          'PlayerBugFix',
+          1,
+          'Player bug caught and messed up: reverting to surefire methods!'
+        );
       }
 
       this.emit('PLAYER_DISCONNECTED', data);
@@ -485,19 +493,27 @@ export default class SquadServer extends EventEmitter {
       const nextMap = await this.rcon.getNextMap();
       const nextMapToBeVoted = nextMap.layer === 'To be voted';
 
-      Logger.verbose('layerupdate', 1, "curlay name:" + currentLayer?.name + ", rcon name:" + currentMap.layer);
-      if (currentLayer?.name !== currentMap.layer){
+      Logger.verbose(
+        'layerupdate',
+        1,
+        'curlay name:' + currentLayer?.name + ', rcon name:' + currentMap.layer
+      );
+      if (currentLayer?.name !== currentMap.layer) {
         let rconlayer = await Layers.getLayerByName(currentMap.layer);
         if (!rconlayer) rconlayer = await Layers.getLayerById(currentMap.layer);
         if (!rconlayer) rconlayer = await Layers.getLayerByClassname(currentMap.layer);
 
-        if (rconlayer && (currentMap.layer !== "Jensen's Training Range")){
+        if (rconlayer && currentMap.layer !== "Jensen's Training Range") {
           currentLayer = rconlayer;
-          Logger.verbose('layerupdate', 1, `RCON is setting Layer information to ${rconlayer.layerid}`);
+          Logger.verbose(
+            'layerupdate',
+            1,
+            `RCON is setting Layer information to ${rconlayer.layerid}`
+          );
         }
       }
-        if (currentLayer) Logger.verbose('layerupdate', 1, 'Found Current layer');
-        else Logger.verbose('layerupdate', 1, 'WARNING: Could not find layer from RCON');
+      if (currentLayer) Logger.verbose('layerupdate', 1, 'Found Current layer');
+      else Logger.verbose('layerupdate', 1, 'WARNING: Could not find layer from RCON');
 
       const nextLayer = nextMapToBeVoted ? null : await Layers.getLayerByName(nextMap.layer);
 
@@ -568,11 +584,19 @@ export default class SquadServer extends EventEmitter {
       this.matchTimeout = info.matchTimeout;
       this.gameVersion = info.gameVersion;
 
-      Logger.verbose('layerupdate', 1, 'a2smsg' + info.currentLayer + ", current id:" + serverlayer?.layerid);
+      Logger.verbose(
+        'layerupdate',
+        1,
+        'a2smsg' + info.currentLayer + ', current id:' + serverlayer?.layerid
+      );
       if (info.currentLayer !== serverlayer?.layerid) {
         const a2slayer = await Layers.getLayerById(info.currentLayer);
-        this.currentLayer = a2slayer ? a2slayer : this.currentLayer;
-        Logger.verbose('layerupdate', 1, `A2S is setting Layer information to ${this.currentLayer?.layerid}`);
+        this.currentLayer = a2slayer || this.currentLayer;
+        Logger.verbose(
+          'layerupdate',
+          1,
+          `A2S is setting Layer information to ${this.currentLayer?.layerid}`
+        );
       }
 
       this.emit('UPDATED_A2S_INFORMATION', info);
