@@ -4,14 +4,14 @@ import axios from 'axios';
 import Gamedig from 'gamedig';
 
 import Logger from 'core/logger';
-import { SQUADJS_API_DOMAIN } from 'core/constants';
+import {SQUADJS_API_DOMAIN} from 'core/constants';
 
-import { Layers } from './layers/index.js';
+import {Layers} from './layers/index.js';
 
 import LogParser from './log-parser/index.js';
 import Rcon from './rcon.js';
 
-import { SQUADJS_VERSION } from './utils/constants.js';
+import {SQUADJS_VERSION} from './utils/constants.js';
 
 import fetchAdminLists from './utils/admin-lists.js';
 
@@ -245,8 +245,7 @@ export default class SquadServer extends EventEmitter {
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (!data.player) {
-        const foundoldplayer = this.oldplayers?.get(data.steamID);
-        data.player = foundoldplayer || null;
+        data.player = (typeof this.oldplayers[data.steamID] === 'undefined') ? null : this.oldplayers[data.steamID];
         Logger.verbose(
           'PlayerBugFix',
           1,
