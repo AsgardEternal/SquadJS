@@ -245,11 +245,14 @@ export default class SquadServer extends EventEmitter {
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (!data.player) {
-        data.player = (typeof this.oldplayers[data.steamID] === 'undefined') ? null : this.oldplayers[data.steamID];
+        data.player = this.oldplayers[data.steamID]
+        if (!data.player || (typeof data.player === 'undefined')){
+          data.player = null
+        }
         Logger.verbose(
           'PlayerBugFix',
           1,
-          `Player bug caught: found disconnect player info to be ${JSON.stringify(data.player)}`
+          `Player bug caught: found disconnect player info to be ${JSON.stringify(data.player)}, with oldplayers: ${JSON.stringify(this.oldplayers)}`
         );
       }
       if (!data.player) {
