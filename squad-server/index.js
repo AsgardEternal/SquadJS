@@ -415,8 +415,10 @@ export default class SquadServer extends EventEmitter {
 
     try {
       const oldPlayerInfo = {};
+      this.oldplayers = {};
       for (const player of this.players) {
         oldPlayerInfo[player.steamID] = player;
+        this.oldplayers[player.steamID] = player;
       }
 
       const players = [];
@@ -432,7 +434,6 @@ export default class SquadServer extends EventEmitter {
       }
 
       this.players = players;
-      this.oldplayers = oldPlayerInfo;
 
       Logger.verbose('PlayerBugFix', 1, 'saving old player info');
 
