@@ -29,7 +29,7 @@ export default class SquadServer extends EventEmitter {
     this.layerHistoryMaxLength = options.layerHistoryMaxLength || 20;
 
     this.players = [];
-    this.oldplayers = [];
+    this.playerinfo = [];
 
     this.squads = [];
 
@@ -245,14 +245,16 @@ export default class SquadServer extends EventEmitter {
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (!data.player) {
-        data.player = this.oldplayers[data.steamID]
-        if (!data.player || (typeof data.player === 'undefined')){
+        data.player = this.playerinfo[data.steamID]
+        if ((!data.player) || (typeof data.player === 'undefined')){
           data.player = null
+        } else {
+          delete this.playerinfo[data.steamID]
         }
         Logger.verbose(
           'PlayerBugFix',
           1,
-          `Player bug caught: found disconnect player info to be ${JSON.stringify(data.player)}, with oldplayers: ${JSON.stringify(this.oldplayers)}`
+          `Player bug caught: found disconnect player info to be ${JSON.stringify(data.player)}, for ${data.steamID} with oldplayers: ${JSON.stringify(this.oldplayers)}`
         );
       }
       if (!data.player) {
@@ -415,10 +417,8 @@ export default class SquadServer extends EventEmitter {
 
     try {
       const oldPlayerInfo = {};
-      this.oldplayers = {};
       for (const player of this.players) {
         oldPlayerInfo[player.steamID] = player;
-        this.oldplayers[player.steamID] = player;
       }
 
       const players = [];
@@ -434,6 +434,9 @@ export default class SquadServer extends EventEmitter {
       }
 
       this.players = players;
+      for (const player of players) {
+        this.playerinfo[player.steamID] = player;
+      }
 
       Logger.verbose('PlayerBugFix', 1, 'saving old player info');
 
