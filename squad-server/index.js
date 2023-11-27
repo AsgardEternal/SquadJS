@@ -262,7 +262,7 @@ export default class SquadServer extends EventEmitter {
         Logger.verbose(
           'PlayerBugFix',
           1,
-          'Player bug caught and messed up: reverting to surefire methods!'
+          `Player bug caught and messed up: reverting to surefire methods for steamid: ${data.steamID}!`
         );
       }
 
