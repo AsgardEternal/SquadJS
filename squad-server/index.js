@@ -254,7 +254,7 @@ export default class SquadServer extends EventEmitter {
         Logger.verbose(
           'PlayerBugFix',
           1,
-          `Player bug caught: found disconnect player info to be ${JSON.stringify(data.player)}, for ${data.steamID} with oldplayers: ${JSON.stringify(this.oldplayers)}`
+          `Player bug caught: found disconnect player info to be ${JSON.stringify(data.player)}, for ${data.steamID} with oldplayers: ${JSON.stringify(this.playerinfo)}`
         );
       }
       if (!data.player) {
