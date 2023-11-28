@@ -29,7 +29,7 @@ export default class SquadServer extends EventEmitter {
     this.layerHistoryMaxLength = options.layerHistoryMaxLength || 20;
 
     this.players = [];
-    this.playerinfo = [];
+    this.playerinfo = new Map();
 
     this.squads = [];
 
@@ -245,18 +245,14 @@ export default class SquadServer extends EventEmitter {
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (!data.player) {
-        data.player = this.playerinfo[data.steamID]
-        if ((!data.player) || (typeof data.player === 'undefined')){
-          data.player = null
-        } else {
-          delete this.playerinfo[data.steamID]
-        }
+        data.player = this.playerinfo.get(data.steamID);
       }
       if (!data.player) {
         data.player = {
           steamID: data.steamID
         };
       }
+      this.playerinfo.delete(data.steamID);
 
       this.emit('PLAYER_DISCONNECTED', data);
     });
@@ -406,15 +402,15 @@ export default class SquadServer extends EventEmitter {
     Logger.verbose('SquadServer', 1, `Updating player list...`);
 
     try {
-      const oldPlayerInfo = {};
+      const oldPlayerInfo = new Map();
       for (const player of this.players) {
-        oldPlayerInfo[player.steamID] = player;
+        oldPlayerInfo.set(player.steamID, player);
       }
 
       const players = [];
       for (const player of await this.rcon.getListPlayers()) {
         players.push({
-          ...oldPlayerInfo[player.steamID],
+          ...oldPlayerInfo.get(player.steamID),
           ...player,
           playercont: this.logParser.eventStore.players[player.steamID]
             ? this.logParser.eventStore.players[player.steamID].controller
@@ -425,27 +421,28 @@ export default class SquadServer extends EventEmitter {
 
       this.players = players;
       for (const player of players) {
-        this.playerinfo[player.steamID] = player;
+        this.playerinfo.set(player.steamID, player);
       }
 
       for (const player of this.players) {
-        if (typeof oldPlayerInfo[player.steamID] === 'undefined') continue;
-        if (player.name !== oldPlayerInfo[player.steamID].name)
+        const oldplayer = oldPlayerInfo.get(player.steamID);
+        if (!oldplayer) continue;
+        if (player.name !== oldplayer.name)
           this.emit('PLAYER_NAME_CHANGE', {
             player: player,
-            oldName: oldPlayerInfo[player.steamID].name,
+            oldName: oldplayer.name,
             newName: player.name
           });
-        if (player.teamID !== oldPlayerInfo[player.steamID].teamID)
+        if (player.teamID !== oldplayer.teamID)
           this.emit('PLAYER_TEAM_CHANGE', {
             player: player,
-            oldTeamID: oldPlayerInfo[player.steamID].teamID,
+            oldTeamID: oldplayer.teamID,
             newTeamID: player.teamID
           });
-        if (player.squadID !== oldPlayerInfo[player.steamID].squadID)
+        if (player.squadID !== oldplayer.squadID)
           this.emit('PLAYER_SQUAD_CHANGE', {
             player: player,
-            oldSquadID: oldPlayerInfo[player.steamID].squadID,
+            oldSquadID: oldplayer.squadID,
             newSquadID: player.squadID
           });
       }
