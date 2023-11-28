@@ -243,11 +243,14 @@ export default class SquadServer extends EventEmitter {
     });
 
     this.logParser.on('PLAYER_DISCONNECTED', async (data) => {
+      Logger.verbose('PlayerBugFix', 1, `player ${data.steamID} disconnect with playerinfo: ${JSON.stringify(this.playerinfo)}`);
       data.player = await this.getPlayerBySteamID(data.steamID);
       if (!data.player) {
+        Logger.verbose('PlayerBugFix', 1, `Bug detected, using playerinfo data for ${data.steamID}`);
         data.player = this.playerinfo.get(data.steamID);
       }
       if (!data.player) {
+        Logger.verbose('PlayerBugFix', 1, `Bug detected, FAILED, falling back for ${data.steamID}`);
         data.player = {
           steamID: data.steamID
         };
