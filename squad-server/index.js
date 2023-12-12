@@ -3,14 +3,14 @@ import EventEmitter from 'events';
 import axios from 'axios';
 
 import Logger from 'core/logger';
-import {SQUADJS_API_DOMAIN} from 'core/constants';
+import { SQUADJS_API_DOMAIN } from 'core/constants';
 
-import {Layers} from './layers/index.js';
+import { Layers } from './layers/index.js';
 
 import LogParser from './log-parser/index.js';
 import Rcon from './rcon.js';
 
-import {SQUADJS_VERSION} from './utils/constants.js';
+import { SQUADJS_VERSION } from './utils/constants.js';
 
 import fetchAdminLists from './utils/admin-lists.js';
 
