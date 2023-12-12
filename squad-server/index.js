@@ -73,6 +73,7 @@ export default class SquadServer extends EventEmitter {
     this.admins = await fetchAdminLists(this.options.adminLists);
 
     await this.rcon.connect();
+    await this.updateLayerList();
     await this.logParser.watch();
 
     await this.updateSquadList();
