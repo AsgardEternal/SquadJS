@@ -574,6 +574,7 @@ export default class SquadServer extends EventEmitter {
 
     Logger.verbose('SquadServer', 1, `Updating A2S information...`);
 
+    const serverlayer = this.currentLayer;
     try {
       // const data = await Gamedig.query({
       //   type: 'squad',
