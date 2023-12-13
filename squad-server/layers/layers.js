@@ -26,9 +26,7 @@ class Layers {
 
     Logger.verbose('Layers', 1, 'Pulling layers...');
     const response = await axios.post(
-      // Change get to post for mod support
-      'http://hub.afocommunity.com/api/layers.json',
-      [0, 2891780963, 1959152751, 2428425228]
+      'https://raw.githubusercontent.com/fantinodavide/LayerList/main/layers.json'
     );
 
     //     const response = await axios.get(
