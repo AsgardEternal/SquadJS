@@ -26,8 +26,8 @@ class Layers {
 
     Logger.verbose('Layers', 1, 'Pulling layers...');
     try {
-      const response = await axios.post(
-          'https://raw.githubusercontent.com/fantinodavide/LayerList/main/layers.json'
+      const response = await axios.get(
+          'https://raw.githubusercontent.com/Squad-Wiki/squad-wiki-pipeline-map-data/master/completed_output/_Current%20Version/finished.json'
       );
       for (const layer of response.data.Maps) {
         const newLayer = new Layer(layer);
