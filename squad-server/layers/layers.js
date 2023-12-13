@@ -25,18 +25,22 @@ class Layers {
     this._layers = new Map();
 
     Logger.verbose('Layers', 1, 'Pulling layers...');
-    const response = await axios.post(
-      'https://raw.githubusercontent.com/fantinodavide/LayerList/main/layers.json'
-    );
+    try {
+      const response = await axios.post(
+          'https://raw.githubusercontent.com/fantinodavide/LayerList/main/layers.json'
+      );
+      for (const layer of response.data.Maps) {
+        const newLayer = new Layer(layer);
+        this._layers.set(newLayer.layerid, newLayer);
+      }
+    } catch {
+      Logger.verbose('Layers', 1, 'Failed to pull layer data from URL!');
+    }
 
     //     const response = await axios.get(
     //       'https://raw.githubusercontent.com/Squad-Wiki/squad-wiki-pipeline-map-data/master/completed_output/_Current%20Version/finished.json'
     //     );
 
-    for (const layer of response.data.Maps) {
-      const newLayer = new Layer(layer);
-      this._layers.set(newLayer.layerid, newLayer);
-    }
 
     Logger.verbose('Layers', 1, `Pulled ${this.layers.length} layers.`);
 
