@@ -186,7 +186,7 @@ export default class Rcon extends EventEmitter {
       return this.soh;
     }
     const bufSize = this.stream.readInt32LE(0);
-    if (bufSize > 4154 || bufSize < 10) return this.badPacket();
+    if (bufSize > 8192 || bufSize < 10) return this.badPacket();
     else if (bufSize <= this.stream.byteLength - 4 && this.stream.byteLength >= 12) {
       const bufId = this.stream.readInt32LE(4);
       const bufType = this.stream.readInt32LE(8);
@@ -228,7 +228,7 @@ export default class Rcon extends EventEmitter {
       this.emit(`response${this.responseString.id - 2}`, this.responseString.body);
       this.responseString.body = '';
     } else if (!packet.body.includes('')) {
-      this.responseString.body = this.responseString.body += packet.body;
+      this.responseString.body = this.responseString.body + packet.body;
       this.responseString.id = packet.id;
     } else this.badPacket();
   }
@@ -241,7 +241,7 @@ export default class Rcon extends EventEmitter {
       }`
     );
     this.stream = Buffer.alloc(0);
-    this.responseString = '';
+    this.responseString.body = '';
     return null;
   }
   onClose() {
