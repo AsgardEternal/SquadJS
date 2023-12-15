@@ -81,6 +81,8 @@ export default class SquadServer extends EventEmitter {
     await this.updateLayerInformation();
     await this.updateA2SInformation();
 
+    await this.logParser.watch();
+
     Logger.verbose('SquadServer', 1, `Watching ${this.serverName}...`);
 
     await this.pingSquadJSAPI();
@@ -159,6 +161,8 @@ export default class SquadServer extends EventEmitter {
 
     this.rcon.on('SQUAD_CREATED', async (data) => {
       data.player = await this.getPlayerBySteamID(data.playerSteamID, true);
+      data.player.squadID = data.squadID;
+
       delete data.playerName;
       delete data.playerSteamID;
 
@@ -484,6 +488,13 @@ export default class SquadServer extends EventEmitter {
             newSquadID: player.squadID
           });
       }
+
+      if (this.a2sPlayerCount > 0 && players.length === 0)
+        Logger.verbose(
+          'SquadServer',
+          1,
+          `Real Player Count: ${this.a2sPlayerCount} but loaded ${players.length}`
+        );
 
       this.emit('UPDATED_PLAYER_INFORMATION');
     } catch (err) {

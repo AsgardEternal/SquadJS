@@ -144,24 +144,19 @@ export default class SquadRcon extends Rcon {
 
     for (const line of response.split('\n')) {
       const match = line.match(
-        /ID: ([0-9]+) \| Online IDs: EOS: ([0-9a-f]{32}) steam: (\d{17}) \| Name: (.+) \| Team ID: ([0-9]+) \| Squad ID: ([0-9]+|N\/A) \| Is Leader: (True|False) \| Role: ([A-Za-z0-9_]*)\b/
+        /^ID: (?<playerID>\d+) \| Online IDs: EOS: (?<EOSID>[a-f\d]{32}) (?:steam: (?<steamID>\d{17}) )?\| Name: (?<name>.+) \| Team ID: (?<teamID>\d|N\/A) \| Squad ID: (?<squadID>\d+|N\/A) \| Is Leader: (?<isLeader>True|False) \| Role: (?<role>.+)$/
       );
       if (!match) continue;
 
-      if (server && server.rcon) server.rcon.addIds(match[3], match[2]);
+      if (server?.rcon?.addIds) server.rcon.addIds(match[3], match[2]);
 
-      players.push({
-        playerID: match[1],
-        EOSID: match[2],
-        steamID: match[3],
-        name: match[4],
-        teamID: match[5],
-        squadID: match[6] !== 'N/A' ? match[5] : null,
-        isLeader: match[7] === 'True',
-        isSquadLeader: match[7] === 'True',
-        role: match[8],
-        rconRole: match[8]
-      });
+      const data = match.groups;
+      data.isLeader = data.isLeader === 'True';
+      data.squadID = data.squadID !== 'N/A' ? data.squadID : null;
+      data.isSquadLeader = match[7] === 'True';
+      data.rconRole = match[8];
+
+      players.push(data);
     }
 
     return players;
@@ -178,9 +173,9 @@ export default class SquadRcon extends Rcon {
 
     for (const line of responseSquad.split('\n')) {
       const match = line.match(
-        /ID: ([0-9]+) \| Name: (.+) \| Size: ([0-9]+) \| Locked: (True|False) \| Creator Name: (.+) \| Creator Online IDs: EOS: ([0-9a-f]{32}) steam: (\d{17})/
+        /ID: (\d+) \| Name: (.+) \| Size: (\d+) \| Locked: (True|False) \| Creator Name: (.+) \| Creator Online IDs: EOS: ([a-f\d]{32}) steam: (\d{17})/
       );
-      const matchSide = line.match(/Team ID: (1|2) \((.+)\)/);
+      const matchSide = line.match(/Team ID: (\d) \((.+)\)/);
       if (matchSide) {
         teamID = matchSide[1];
         teamName = matchSide[2];
@@ -192,6 +187,7 @@ export default class SquadRcon extends Rcon {
         size: match[3],
         locked: match[4],
         creatorName: match[5],
+        creatorEOSID: match[6],
         creatorSteamID: match[7],
         teamID: teamID,
         teamName: teamName
