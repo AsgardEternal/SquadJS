@@ -745,17 +745,17 @@ export default class SquadServer extends EventEmitter {
     };
   }
 
-  async getPlayerByCondition(condition, forceUpdate = false, retry = true) {
+  async getPlayerByCondition(condition, forceUpdate = false, retry = false) {
     let matches;
 
     if (!forceUpdate) {
       matches = this.players.filter(condition);
       if (matches.length === 1) return matches[0];
-
+      Logger.verbose('updatePlayerList', 1, `ERROR: failed to find player ${JSON.stringify(condition)}, matches found: ${matches.length}`);
       if (!retry) return null;
     }
 
-    await this.updatePlayerList();
+    // await this.updatePlayerList();
 
     matches = this.players.filter(condition);
     if (matches.length === 1) return matches[0];
@@ -763,17 +763,17 @@ export default class SquadServer extends EventEmitter {
     return null;
   }
 
-  async getSquadByCondition(condition, forceUpdate = false, retry = true) {
+  async getSquadByCondition(condition, forceUpdate = false, retry = false) {
     let matches;
 
     if (!forceUpdate) {
       matches = this.squads.filter(condition);
       if (matches.length === 1) return matches[0];
-
+      Logger.verbose('updateSquadList', 1, `ERROR: failed to find squad ${JSON.stringify(condition)}, matches found: ${matches.length}`);
       if (!retry) return null;
     }
 
-    await this.updateSquadList();
+    // await this.updateSquadList();
 
     matches = this.squads.filter(condition);
     if (matches.length === 1) return matches[0];
