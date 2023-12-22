@@ -454,9 +454,9 @@ export default class SquadServer extends EventEmitter {
         players.push({
           ...oldPlayerInfo.get(player.eosID),
           ...player,
-          playercont: this.logParser.eventStore.players[player.steamID]
-            ? this.logParser.eventStore.players[player.steamID].controller
-            : null,
+          // playercontroller: this.logParser.eventStore.players[player.steamID]
+          //   ? this.logParser.eventStore.players[player.steamID].controller
+          //   : null,
           squad: await this.getSquadByID(player.teamID, player.squadID)
         });
       }
@@ -812,7 +812,7 @@ export default class SquadServer extends EventEmitter {
 
   async getPlayerByController(controller, forceUpdate) {
     if (controller == null) return null;
-    return this.getPlayerByCondition((player) => player.playercont === controller, forceUpdate);
+    return this.getPlayerByCondition((player) => player.playercontroller === controller, forceUpdate);
   }
 
   async getPlayerByClassname(classname, forceUpdate){
