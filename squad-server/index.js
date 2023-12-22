@@ -368,7 +368,7 @@ export default class SquadServer extends EventEmitter {
         time: data.time,
         rawID: data.characterName,
         cheatType: 'Remote Actions',
-        player: await this.getPlayerByCondition((p) => p.characterClassname === data.characterName),
+        player: await this.getPlayerByClassname(data.characterName),
         probcheat: data.cts < 2 ? 'unlikely' : null,
         probcolor: data.cts < 2 ? 0xffff00 : null
       };
@@ -752,6 +752,7 @@ export default class SquadServer extends EventEmitter {
       matches = this.players.filter(condition);
       if (matches.length === 1) return matches[0];
       Logger.verbose('updatePlayerList', 1, `ERROR: failed to find player ${JSON.stringify(condition)}, matches found: ${matches.length}`);
+      Logger.verbose('updatePlayerList', 1, `this.players: ${JSON.stringify(this.players)}`);
       if (!retry) return null;
     }
 
@@ -782,33 +783,44 @@ export default class SquadServer extends EventEmitter {
   }
 
   async getSquadByID(teamID, squadID) {
-    if (squadID === null) return null;
+    if (squadID == null || teamID == null) return null;
     return this.getSquadByCondition(
       (squad) => squad.teamID === teamID && squad.squadID === squadID
     );
   }
 
   async getPlayerBySteamID(steamID, forceUpdate) {
+    if (steamID == null) return null;
     return this.getPlayerByCondition((player) => player.steamID === steamID, forceUpdate);
   }
 
   async getPlayerByEOSID(eosID, forceUpdate) {
+    if (eosID == null) return null;
     return this.getPlayerByCondition((player) => player.EOSID === eosID, forceUpdate);
   }
 
   async getPlayerByName(name, forceUpdate) {
+    if (name == null) return null;
     return this.getPlayerByCondition((player) => player.name === name, forceUpdate);
   }
 
   async getPlayerByNameSuffix(suffix, forceUpdate) {
+    if (suffix == null) return null;
     return this.getPlayerByCondition((player) => player.suffix === suffix, forceUpdate, false);
   }
 
   async getPlayerByController(controller, forceUpdate) {
+    if (controller == null) return null;
     return this.getPlayerByCondition((player) => player.playercont === controller, forceUpdate);
   }
 
+  async getPlayerByClassname(classname, forceUpdate){
+    if (classname == null) return null;
+    return this.getPlayerByCondition((player) => player.classname === classname, forceUpdate);
+  }
+
   async pingSquadJSAPI() {
+    return;
     if (this.pingSquadJSAPITimeout) clearTimeout(this.pingSquadJSAPITimeout);
 
     Logger.verbose('SquadServer', 1, 'Pinging SquadJS API...');
