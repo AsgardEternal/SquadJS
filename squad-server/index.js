@@ -749,6 +749,7 @@ export default class SquadServer extends EventEmitter {
     let matches;
 
     if (!forceUpdate) {
+      Logger.verbose('updatePlayerList', 1, `trying to get condition ${JSON.stringify(condition)}`);
       matches = this.players.filter(condition);
       if (matches.length === 1) return matches[0];
       Logger.verbose('updatePlayerList', 1, `ERROR: failed to find player ${JSON.stringify(condition)}, matches found: ${matches.length}`);
