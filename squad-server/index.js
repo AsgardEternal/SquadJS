@@ -450,6 +450,7 @@ export default class SquadServer extends EventEmitter {
       }
 
       const players = [];
+      Logger.verbose('updatePlayerList',1,`eventstore player data: ${JSON.stringify(this.logParser.eventStore.players)}`);
       for (const player of await this.rcon.getListPlayers(this)){
         players.push({
           ...oldPlayerInfo.get(player.eosID),
