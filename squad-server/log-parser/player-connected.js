@@ -14,7 +14,13 @@ export default {
     const joinRequestData = logParser.eventStore.joinRequests[+args[2]];
     data.connection = joinRequestData.connection;
     data.playerSuffix = joinRequestData.suffix;
+    data.playercontroller = joinRequestData.controller;
 
     logParser.emit('PLAYER_CONNECTED', data);
+    logParser.eventStore.players[data.steamID] = {
+      steamID: data.steamID,
+      suffix: data.playerSuffix,
+      controller: data.playercontroller
+    };
   }
 };

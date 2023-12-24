@@ -454,9 +454,9 @@ export default class SquadServer extends EventEmitter {
         players.push({
           ...oldPlayerInfo.get(player.eosID),
           ...player,
-          // playercontroller: this.logParser.eventStore.players[player.steamID]
-          //   ? this.logParser.eventStore.players[player.steamID].controller
-          //   : null,
+          playercontroller: this.logParser.eventStore.players[player.steamID]
+            ? this.logParser.eventStore.players[player.steamID].controller
+            : null,
           squad: await this.getSquadByID(player.teamID, player.squadID)
         });
       }
