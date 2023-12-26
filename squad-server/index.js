@@ -246,9 +246,11 @@ export default class SquadServer extends EventEmitter {
       data.player = await this.getPlayerByEOSID(data.eosID);
       if (data.player) data.player.suffix = data.playerSuffix;
       else {
+          Logger.verbose('updatePlayerList', 1, `ERROR: failed to get player by RCON for ${data.steamID},${data.playerSuffix}`);
           data.player = {
               steamID: data.steamID,
               name: data.playerSuffix,
+              suffix: data.playerSuffix,
               eosID: data.eosID
           }
       }
@@ -451,7 +453,7 @@ export default class SquadServer extends EventEmitter {
 
       const players = [];
       Logger.verbose('updatePlayerList',1,`eventstore player data: ${JSON.stringify(this.logParser.eventStore.players)}`);
-      for (const player of await this.rcon.getListPlayers(this)){
+      for (const player of await this.rcon.getListPlayers()){
         players.push({
           ...oldPlayerInfo.get(player.eosID),
           ...player,
@@ -468,7 +470,7 @@ export default class SquadServer extends EventEmitter {
       }
 
       for (const player of this.players) {
-        const oldplayer = oldPlayerInfo.get(player.steamID);
+        const oldplayer = oldPlayerInfo.get(player.eosID);
         if (!oldplayer) continue;
         if (player.name !== oldplayer.name)
           this.emit('PLAYER_NAME_CHANGE', {
