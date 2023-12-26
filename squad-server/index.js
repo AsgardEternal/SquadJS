@@ -270,7 +270,7 @@ export default class SquadServer extends EventEmitter {
         if (!data.player){
             Logger.verbose('PlayerBugFix', 1, `Bug detected, FAILED, falling back for ${data.steamID}`);
             data.player = {
-                steamID: data.steamID,
+                steamID: this.rcon.eosIndex[data.playerEOSID],
                 eosID: data.playerEOSID
             };
         }
