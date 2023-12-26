@@ -464,7 +464,7 @@ export default class SquadServer extends EventEmitter {
 
       this.players = players;
       for (const player of players) {
-        this.playerinfo.set(player.steamID, player);
+        this.playerinfo.set(player.eosID, player);
       }
 
       for (const player of this.players) {
