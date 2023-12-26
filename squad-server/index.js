@@ -761,6 +761,7 @@ export default class SquadServer extends EventEmitter {
     }
 
     // await this.updatePlayerList();
+    Logger.verbose('updatePlayerList', 1, 'ERROR: attempted to update player list through RCON');
 
     matches = this.players.filter(condition);
     if (matches.length === 1) return matches[0];
