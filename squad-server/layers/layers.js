@@ -33,6 +33,13 @@ class Layers {
         const newLayer = new Layer(layer);
         this._layers.set(newLayer.layerid, newLayer);
       }
+      const response2 = await axios.get(
+        'https://raw.githubusercontent.com/fantinodavide/SquadLayerList/main/mee.json'
+      );
+      for (const layer of response2.data.Maps) {
+        const newLayer = new Layer(layer);
+        this._layers.set(newLayer.layerid, newLayer);
+      }
     } catch {
       Logger.verbose('Layers', 1, 'Failed to pull layer data from URL!');
     }
