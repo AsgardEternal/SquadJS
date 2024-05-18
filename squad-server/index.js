@@ -705,7 +705,7 @@ export default class SquadServer extends EventEmitter {
   mapLayer(layid) {
     layid = layid.replace(/[^\da-z_-]/gi, '');
     const gl =
-      /^((?<mod>[A-Z]+)_)?(?<level>[A-Za-z]+)_((?<gamemode>[A-Za-z]+)(_|$))?((?<version>[vV][0-9]+)(_|$))?((?<team1>[a-zA-Z0-9]+)[-v](?<team2>[a-zA-Z0-9]+))?/gm.exec(
+      /^((?<mod>[A-Z]+)_)?(?<level>[A-Za-z_]+?)_((?<gamemode>[A-Za-z]+)(_|$))?((?<version>[vV][0-9]+(-\w)?|[DN])(_|$))?((?<team1>[a-zA-Z0-9]+)[-v_](?<team2>[a-zA-Z0-9]+))?(_CQB)?$/gm.exec(
         layid
       )?.groups;
     if (!gl) return;
@@ -825,53 +825,54 @@ export default class SquadServer extends EventEmitter {
   }
 
   async pingSquadJSAPI() {
-    return;
-    if (this.pingSquadJSAPITimeout) clearTimeout(this.pingSquadJSAPITimeout);
 
-    Logger.verbose('SquadServer', 1, 'Pinging SquadJS API...');
+    // noinspection UnreachableCodeJS
+    // if (this.pingSquadJSAPITimeout) clearTimeout(this.pingSquadJSAPITimeout);
 
-    const payload = {
-      // Send information about the server.
-      server: {
-        host: this.options.host,
-        queryPort: this.options.queryPort,
-
-        name: this.serverName,
-        playerCount: this.a2sPlayerCount + this.publicQueue + this.reserveQueue
-      },
-
-      // Send information about SquadJS.
-      squadjs: {
-        version: SQUADJS_VERSION,
-        logReaderMode: this.options.logReaderMode,
-
-        // Send the plugin config so we can see what plugins they're using (none of the config is sensitive).
-        plugins: this.plugins.map((plugin) => ({
-          ...plugin.rawOptions,
-          plugin: plugin.constructor.name
-        }))
-      }
-    };
-
-    try {
-      const { data } = await axios.post(SQUADJS_API_DOMAIN + '/api/v1/ping', payload);
-
-      if (data.error)
-        Logger.verbose(
-          'SquadServer',
-          1,
-          `Successfully pinged the SquadJS API. Got back error: ${data.error}`
-        );
-      else
-        Logger.verbose(
-          'SquadServer',
-          1,
-          `Successfully pinged the SquadJS API. Got back message: ${data.message}`
-        );
-    } catch (err) {
-      Logger.verbose('SquadServer', 1, 'Failed to ping the SquadJS API: ', err.message);
-    }
-
-    this.pingSquadJSAPITimeout = setTimeout(this.pingSquadJSAPI, this.pingSquadJSAPIInterval);
+  //   Logger.verbose('SquadServer', 1, 'Pinging SquadJS API...');
+  //
+  //   const payload = {
+  //     // Send information about the server.
+  //     server: {
+  //       host: this.options.host,
+  //       queryPort: this.options.queryPort,
+  //
+  //       name: this.serverName,
+  //       playerCount: this.a2sPlayerCount + this.publicQueue + this.reserveQueue
+  //     },
+  //
+  //     // Send information about SquadJS.
+  //     squadjs: {
+  //       version: SQUADJS_VERSION,
+  //       logReaderMode: this.options.logReaderMode,
+  //
+  //       // Send the plugin config so we can see what plugins they're using (none of the config is sensitive).
+  //       plugins: this.plugins.map((plugin) => ({
+  //         ...plugin.rawOptions,
+  //         plugin: plugin.constructor.name
+  //       }))
+  //     }
+  //   };
+  //
+  //   try {
+  //     const { data } = await axios.post(SQUADJS_API_DOMAIN + '/api/v1/ping', payload);
+  //
+  //     if (data.error)
+  //       Logger.verbose(
+  //         'SquadServer',
+  //         1,
+  //         `Successfully pinged the SquadJS API. Got back error: ${data.error}`
+  //       );
+  //     else
+  //       Logger.verbose(
+  //         'SquadServer',
+  //         1,
+  //         `Successfully pinged the SquadJS API. Got back message: ${data.message}`
+  //       );
+  //   } catch (err) {
+  //     Logger.verbose('SquadServer', 1, 'Failed to ping the SquadJS API: ', err.message);
+  //   }
+  //
+  //   this.pingSquadJSAPITimeout = setTimeout(this.pingSquadJSAPI, this.pingSquadJSAPIInterval);
   }
 }
